@@ -1,0 +1,952 @@
+[
+  {
+    "name": "Rice Blast",
+    "crop": "Rice",
+    "scientific_name": "Magnaporthe oryzae",
+    "symptoms": "Spindle-shaped spots with gray centers and brown borders. Lesions can appear on leaves, nodes, and panicles. Severe infection leads to neck rot.",
+    "causes": "Fungal pathogen, high humidity, cool nighttime temperatures, and excessive nitrogen fertilizer.",
+    "organic_treatment": {
+      "method": "Foliar spray of Neem oil or Trichoderma viride.",
+      "materials": "Neem oil, soap solution, Trichoderma viride formulation.",
+      "dosage": "5ml Neem oil per liter of water; 5g Trichoderma per liter."
+    },
+    "chemical_treatment": {
+      "product": "Beam (Tricyclazole)",
+      "active_ingredient": "Tricyclazole 75% WP",
+      "dosage": "0.6g per liter of water."
+    },
+    "prevention": "Balanced nitrogen application, use resistant varieties, and maintain proper spacing for airflow.",
+    "recovery_days": 15
+  },
+  {
+    "name": "Wheat Rust",
+    "crop": "Wheat",
+    "scientific_name": "Puccinia graminis tritici",
+    "symptoms": "Small, oval, orange-to-red pustules on leaves and stems. Pustules turn black as the plant matures.",
+    "causes": "Airborne fungal spores, moist conditions, and temperatures between 15-25°C.",
+    "organic_treatment": {
+      "method": "Spray fermented butter milk or Cow urine decoction.",
+      "materials": "Fermented buttermilk (3-5 days old), Cow urine.",
+      "dosage": "1 liter buttermilk in 10 liters water; 1:10 ratio for cow urine."
+    },
+    "chemical_treatment": {
+      "product": "Tilt (Propiconazole)",
+      "active_ingredient": "Propiconazole 25% EC",
+      "dosage": "1ml per liter of water."
+    },
+    "prevention": "Eradicate barberry bushes (alternate host), early sowing, and resistant cultivars.",
+    "recovery_days": 20
+  },
+  {
+    "name": "Tomato Late Blight",
+    "crop": "Tomato",
+    "scientific_name": "Phytophthora infestans",
+    "symptoms": "Dark, water-soaked spots on leaves that rapidly enlarge. White fungal growth appears on the underside in humid conditions. Fruits develop firm, dark brown decay.",
+    "causes": "Oomycete pathogen, cool and wet weather (high humidity > 90%).",
+    "organic_treatment": {
+      "method": "Baking soda spray or Copper-based organic fungicide.",
+      "materials": "Baking soda, liquid soap, vegetable oil.",
+      "dosage": "1 tbsp baking soda, 1 tsp soap, 1 tbsp oil in 4 liters water."
+    },
+    "chemical_treatment": {
+      "product": "Ridomil Gold",
+      "active_ingredient": "Metalaxyl-M + Mancozeb",
+      "dosage": "2.5g per liter of water."
+    },
+    "prevention": "Crop rotation, avoid overhead irrigation, and ensure good drainage.",
+    "recovery_days": 10
+  },
+  {
+    "name": "Cotton Bollworm",
+    "crop": "Cotton",
+    "scientific_name": "Helicoverpa armigera",
+    "symptoms": "Larvae bore into squares, flowers, and bolls. Entry holes are visible, often surrounded by fecal matter. Significant yield loss due to boll damage.",
+    "causes": "Pest infestation, migration from neighboring crops, favorable temperatures.",
+    "organic_treatment": {
+      "method": "Neem Seed Kernel Extract (NSKE) or BT spray.",
+      "materials": "Neem seeds, Bacillus thuringiensis (BT) formulation.",
+      "dosage": "5% NSKE; 2g BT per liter of water."
+    },
+    "chemical_treatment": {
+      "product": "Coragen",
+      "active_ingredient": "Chlorantraniliprole 18.5% SC",
+      "dosage": "0.4ml per liter of water."
+    },
+    "prevention": "Pheromone traps (5 per acre), bird perches, and intercropping with cowpea or maize.",
+    "recovery_days": 14
+  },
+  {
+    "name": "Maize Downy Mildew",
+    "crop": "Maize",
+    "scientific_name": "Peronosclerospora sorghi",
+    "symptoms": "Yellowish-green streaks on leaves. White downy growth on both surfaces. Stunted growth and 'crazy top' (distorted tassel).",
+    "causes": "Soil-borne and seed-borne fungus, high humidity, waterlogging.",
+    "organic_treatment": {
+      "method": "Seed treatment with Trichoderma and foliar spray of Ginger-Garlic-Chili extract.",
+      "materials": "Ginger, Garlic, Green Chili, Trichoderma viride.",
+      "dosage": "10g Trichoderma per kg seed; 2% GGC extract."
+    },
+    "chemical_treatment": {
+      "product": "Apron XL (Seed treatment)",
+      "active_ingredient": "Metalaxyl-M",
+      "dosage": "2ml per kg of seed."
+    },
+    "prevention": "Early planting, balanced fertilization, and removal of infected plants.",
+    "recovery_days": 18
+  },
+  {
+    "name": "Potato Early Blight",
+    "crop": "Potato",
+    "scientific_name": "Alternaria solani",
+    "symptoms": "Small, dark, circular spots with concentric rings (target-like appearance) on older leaves. Lower leaves turn yellow and drop.",
+    "causes": "Fungal pathogen, alternating wet and dry periods, high temperatures (24-29°C).",
+    "organic_treatment": {
+      "method": "Compost tea spray or milk-water solution.",
+      "materials": "Finished compost, water, milk.",
+      "dosage": "1:5 ratio for compost tea; 1:9 ratio for milk-water."
+    },
+    "chemical_treatment": {
+      "product": "Amistar (Azoxystrobin)",
+      "active_ingredient": "Azoxystrobin 23% SC",
+      "dosage": "1ml per liter of water."
+    },
+    "prevention": "Use certified disease-free seeds, avoid water stress, and rotate with non-solanaceous crops.",
+    "recovery_days": 12
+  },
+  {
+    "name": "Sugarcane Red Rot",
+    "crop": "Sugarcane",
+    "scientific_name": "Colletotrichum falcatum",
+    "symptoms": "Reddish discoloration of internal tissues with white cross-bands. Withering of leaves and acidic smell in split canes.",
+    "causes": "Infected setts, irrigation water carrying spores, high soil moisture.",
+    "organic_treatment": {
+      "method": "Sett treatment with Trichoderma and soil application.",
+      "materials": "Trichoderma harzianum, farmyard manure.",
+      "dosage": "10g Trichoderma per liter for sett soaking; 2kg per acre in soil."
+    },
+    "chemical_treatment": {
+      "product": "Bavistin",
+      "active_ingredient": "Carbendazim 50% WP",
+      "dosage": "1g per liter (for sett treatment)."
+    },
+    "prevention": "Hot water treatment of setts (50°C for 2 hours), field sanitation, and 2-year crop rotation.",
+    "recovery_days": 30
+  },
+  {
+    "name": "Mango Anthracnose",
+    "crop": "Mango",
+    "scientific_name": "Colletotrichum gloeosporioides",
+    "symptoms": "Black, sunken spots on leaves, twigs, and fruits. Young leaves wither and drop. Fruits rot during ripening.",
+    "causes": "Fungal pathogen, high humidity, frequent rains during flowering.",
+    "organic_treatment": {
+      "method": "Spray of Pseudomonas fluorescens or Neem oil.",
+      "materials": "Pseudomonas formulation, Neem oil.",
+      "dosage": "5g Pseudomonas per liter; 3ml Neem oil per liter."
+    },
+    "chemical_treatment": {
+      "product": "Contaf Plus",
+      "active_ingredient": "Hexaconazole 5% SC",
+      "dosage": "2ml per liter of water."
+    },
+    "prevention": "Pruning of dead twigs, post-harvest hot water treatment of fruit (52°C for 5 min).",
+    "recovery_days": 21
+  },
+  {
+    "name": "Banana Bunchy Top",
+    "crop": "Banana",
+    "scientific_name": "Banana bunchy top virus (BBTV)",
+    "symptoms": "'Morse code' (dots and dashes) on leaf veins. New leaves are narrow, upright, and bunched at the top. Severe stunting.",
+    "causes": "Virus transmitted by the banana aphid (Pentalonia nigronervosa).",
+    "organic_treatment": {
+      "method": "Control aphids with Neem oil and destroy infected plants.",
+      "materials": "Neem oil, soap solution.",
+      "dosage": "5ml Neem oil per liter of water."
+    },
+    "chemical_treatment": {
+      "product": "Confidor (for aphid control)",
+      "active_ingredient": "Imidacloprid 17.8% SL",
+      "dosage": "0.3ml per liter of water."
+    },
+    "prevention": "Use virus-free suckers/tissue culture plants, rogueing (removing) infected plants immediately.",
+    "recovery_days": 60
+  },
+  {
+    "name": "Chili Leaf Curl",
+    "crop": "Chili",
+    "scientific_name": "Chili leaf curl virus",
+    "symptoms": "Leaves curl upwards and inwards, thicken, and become brittle. Stunted plants with few small fruits.",
+    "causes": "Virus transmitted by Whiteflies (Bemisia tabaci).",
+    "organic_treatment": {
+      "method": "Spray Agni Astra or yellow sticky traps for whiteflies.",
+      "materials": "Cow urine, tobacco, chili, garlic decoction (Agni Astra).",
+      "dosage": "250ml Agni Astra in 15 liters of water."
+    },
+    "chemical_treatment": {
+      "product": "Pegasus",
+      "active_ingredient": "Diafenthiuron 50% WP",
+      "dosage": "1.2g per liter of water."
+    },
+    "prevention": "Border cropping with maize or sorghum, using silver-colored mulches.",
+    "recovery_days": 25
+  },
+  {
+    "name": "Groundnut Leaf Spot",
+    "crop": "Groundnut",
+    "scientific_name": "Cercospora arachidicola",
+    "symptoms": "Circular dark brown spots with yellow halos on leaves. In later stages, leaves drop prematurely.",
+    "causes": "Fungal pathogen, high humidity, high leaf wetness.",
+    "organic_treatment": {
+      "method": "Foliar spray of Dashparni Ark.",
+      "materials": "Fermented extract of 10 types of leaves in cow urine.",
+      "dosage": "500ml Dashparni Ark in 15 liters of water."
+    },
+    "chemical_treatment": {
+      "product": "Kavach",
+      "active_ingredient": "Chlorothalonil 75% WP",
+      "dosage": "2g per liter of water."
+    },
+    "prevention": "Deep summer plowing, balanced potash application, and removal of plant debris.",
+    "recovery_days": 18
+  },
+  {
+    "name": "Citrus Canker",
+    "crop": "Citrus",
+    "scientific_name": "Xanthomonas axonopodis pv. citri",
+    "symptoms": "Raised, corky, brown lesions on leaves, stems, and fruits. Lesions are surrounded by yellow halos.",
+    "causes": "Bacterial pathogen, wind-driven rain, overhead irrigation.",
+    "organic_treatment": {
+      "method": "Spray of Streptomycin mixed with Copper oxychloride or cow dung slurry.",
+      "materials": "Streptomycin sulfate, Copper oxychloride, Fresh cow dung.",
+      "dosage": "0.1g Streptomycin + 3g Copper oxychloride per liter."
+    },
+    "chemical_treatment": {
+      "product": "Blitox",
+      "active_ingredient": "Copper Oxychloride 50% WP",
+      "dosage": "3g per liter of water."
+    },
+    "prevention": "Pruning infected parts during the dry season, using resistant rootstocks like Rangpur lime.",
+    "recovery_days": 25
+  },
+  {
+    "name": "Pigeon Pea Wilt",
+    "crop": "Pigeon Pea",
+    "scientific_name": "Fusarium udum",
+    "symptoms": "Gradual yellowing and withering of leaves. Blackening of the main root and stem pith (vascular browning).",
+    "causes": "Soil-borne fungus, continuous cropping of pigeon pea.",
+    "organic_treatment": {
+      "method": "Soil application of Trichoderma viride enriched Farm Yard Manure (FYM).",
+      "materials": "Trichoderma, FYM.",
+      "dosage": "2kg Trichoderma mixed with 100kg FYM per acre."
+    },
+    "chemical_treatment": {
+      "product": "Thiram",
+      "active_ingredient": "Thiram 75% WS",
+      "dosage": "3g per kg of seed (seed treatment)."
+    },
+    "prevention": "Intercropping with Sorghum, 3-year crop rotation, and deep summer plowing.",
+    "recovery_days": 45
+  },
+  {
+    "name": "Grapes Downy Mildew",
+    "crop": "Grapes",
+    "scientific_name": "Plasmopara viticola",
+    "symptoms": "Yellowish 'oil spots' on the upper leaf surface. White cottony growth on the underside. Infected berries turn brown and shrivel.",
+    "causes": "Fungal-like oomycete, high humidity (>85%), rainfall, and leaf wetness.",
+    "organic_treatment": {
+      "method": "Bordeaux mixture spray (1%).",
+      "materials": "Copper sulfate, Lime, Water.",
+      "dosage": "1kg Copper sulfate + 1kg Lime in 100 liters water."
+    },
+    "chemical_treatment": {
+      "product": "Revus",
+      "active_ingredient": "Mandipropamid 23.3% SC",
+      "dosage": "0.8ml per liter of water."
+    },
+    "prevention": "Proper canopy management for ventilation, removal of fallen leaves, and drip irrigation.",
+    "recovery_days": 14
+  },
+  {
+    "name": "Onion Purple Blotch",
+    "crop": "Onion",
+    "scientific_name": "Alternaria porri",
+    "symptoms": "Small, water-soaked lesions that turn purple with a yellowish border. Leaves break and fall.",
+    "causes": "Fungal pathogen, warm and humid weather (25-30°C).",
+    "organic_treatment": {
+      "method": "Spray of Neem oil or Jeevamrutha.",
+      "materials": "Neem oil, Jeevamrutha (cow dung/urine/jaggery/pulse flour fermented).",
+      "dosage": "5ml Neem oil per liter; 1 liter Jeevamrutha in 10 liters water."
+    },
+    "chemical_treatment": {
+      "product": "Score",
+      "active_ingredient": "Difenoconazole 25% EC",
+      "dosage": "1ml per liter of water."
+    },
+    "prevention": "Maintain wider spacing, avoid excessive nitrogen, and improve drainage.",
+    "recovery_days": 15
+  },
+  {
+    "name": "Apple Scab",
+    "crop": "Apple",
+    "scientific_name": "Venturia inaequalis",
+    "symptoms": "Olive-green to black velvety spots on leaves and fruit. Fruit becomes cracked and deformed.",
+    "causes": "Fungal pathogen, cool and wet spring weather.",
+    "organic_treatment": {
+      "method": "Sulfur-based organic fungicide or Apple Cider Vinegar spray.",
+      "materials": "Wettable sulfur, Apple cider vinegar.",
+      "dosage": "3g Sulfur per liter; 1 tbsp vinegar in 1 liter water."
+    },
+    "chemical_treatment": {
+      "product": "Indofil M-45",
+      "active_ingredient": "Mancozeb 75% WP",
+      "dosage": "3g per liter of water."
+    },
+    "prevention": "Pruning for sunlight penetration, removal of fallen leaves in winter.",
+    "recovery_days": 20
+  },
+  {
+    "name": "Papaya Ring Spot",
+    "crop": "Papaya",
+    "scientific_name": "Papaya ringspot virus (PRSV)",
+    "symptoms": "Yellowing and mottling of leaves. Dark green streaks on petioles. Fruits show characteristic 'ring spots'.",
+    "causes": "Virus transmitted by aphids.",
+    "organic_treatment": {
+      "method": "Aphid management with Neem oil and border cropping with corn.",
+      "materials": "Neem oil, Corn seeds.",
+      "dosage": "5ml Neem oil per liter; 3 rows of corn as border."
+    },
+    "chemical_treatment": {
+      "product": "Rogor",
+      "active_ingredient": "Dimethoate 30% EC",
+      "dosage": "2ml per liter of water."
+    },
+    "prevention": "Rogueing of infected plants, using net houses for nursery.",
+    "recovery_days": 40
+  },
+  {
+    "name": "Soybean Rust",
+    "crop": "Soybean",
+    "scientific_name": "Phakopsora pachyrhizi",
+    "symptoms": "Tan to reddish-brown lesions on the underside of leaves. Severe infection causes premature defoliation.",
+    "causes": "Airborne spores, high humidity, long periods of leaf wetness.",
+    "organic_treatment": {
+      "method": "Spray of fermented wood ash or Ginger extract.",
+      "materials": "Wood ash, Ginger, Soap.",
+      "dosage": "20g Wood ash per liter; 5% Ginger extract."
+    },
+    "chemical_treatment": {
+      "product": "Lustre",
+      "active_ingredient": "Flusilazole + Carbendazim",
+      "dosage": "1.5ml per liter of water."
+    },
+    "prevention": "Early planting, monitoring for early signs, and choosing resistant varieties.",
+    "recovery_days": 18
+  },
+  {
+    "name": "Coffee Leaf Rust",
+    "crop": "Coffee",
+    "scientific_name": "Hemileia vastatrix",
+    "symptoms": "Yellow-orange powdery spots on the underside of leaves. Premature leaf drop and reduced bean quality.",
+    "causes": "Fungal pathogen, humidity, rainfall, and moderate temperatures.",
+    "organic_treatment": {
+      "method": "Spray of Bacillus subtilis or 0.5% Bordeaux mixture.",
+      "materials": "Bacillus subtilis formulation, Copper sulfate, Lime.",
+      "dosage": "5g Bacillus per liter; 0.5kg Cu + 0.5kg Lime per 100L water."
+    },
+    "chemical_treatment": {
+      "product": "Bayleton",
+      "active_ingredient": "Triadimefon 25% WP",
+      "dosage": "1g per liter of water."
+    },
+    "prevention": "Proper shading, balanced fertilization, and pruning.",
+    "recovery_days": 25
+  },
+  {
+    "name": "Okra Yellow Vein Mosaic",
+    "crop": "Okra",
+    "scientific_name": "Okra yellow vein mosaic virus (OYVMV)",
+    "symptoms": "Veins turn yellow, while the rest of the leaf remains green. Fruits are small, yellowish-white, and tough.",
+    "causes": "Virus transmitted by whiteflies.",
+    "organic_treatment": {
+      "method": "Management of whiteflies with Neem oil or Verticillium lecanii.",
+      "materials": "Neem oil, Verticillium formulation.",
+      "dosage": "5ml Neem oil per liter; 5g Verticillium per liter."
+    },
+    "chemical_treatment": {
+      "product": "Actara",
+      "active_ingredient": "Thiamethoxam 25% WG",
+      "dosage": "0.5g per liter of water."
+    },
+    "prevention": "Removing alternative weed hosts, sowing resistant hybrids like 'Arka Anamika'.",
+    "recovery_days": 20
+  },
+  {
+    "name": "Mustard Alternaria Blight",
+    "crop": "Mustard",
+    "scientific_name": "Alternaria brassicae",
+    "symptoms": "Small, black circular spots on leaves, stems, and siliquae. Spots enlarge with concentric rings.",
+    "causes": "Fungal pathogen, cool and moist weather, late sowing.",
+    "organic_treatment": {
+      "method": "Seed treatment with garlic extract and foliar spray of Trichoderma.",
+      "materials": "Garlic, Trichoderma viride.",
+      "dosage": "2% Garlic extract for seeds; 5g Trichoderma per liter spray."
+    },
+    "chemical_treatment": {
+      "product": "Rovral",
+      "active_ingredient": "Iprodione 50% WP",
+      "dosage": "2g per liter of water."
+    },
+    "prevention": "Timely sowing (October), removal of crop residues, and balanced fertilization.",
+    "recovery_days": 15
+  },
+  {
+    "name": "Turmeric Leaf Spot",
+    "crop": "Turmeric",
+    "scientific_name": "Colletotrichum capsici",
+    "symptoms": "Oblong spots with yellow halos on leaves. Centers turn gray and thin out, sometimes causing holes.",
+    "causes": "Fungal pathogen, high humidity, frequent rainfall.",
+    "organic_treatment": {
+      "method": "Foliar spray of Pseudomonas fluorescens.",
+      "materials": "Pseudomonas formulation.",
+      "dosage": "10g per liter of water."
+    },
+    "chemical_treatment": {
+      "product": "Folicur",
+      "active_ingredient": "Tebuconazole 25.9% EC",
+      "dosage": "1ml per liter of water."
+    },
+    "prevention": "Selection of healthy rhizomes, crop rotation, and avoidance of shade.",
+    "recovery_days": 20
+  },
+  {
+    "name": "Brinjal Phomopsis Blight",
+    "crop": "Brinjal",
+    "scientific_name": "Phomopsis vexans",
+    "symptoms": "Circular brown spots on leaves; dark, sunken spots on fruits that lead to soft rot.",
+    "causes": "Infected seeds, fungal spores spreading through rain splashes.",
+    "organic_treatment": {
+      "method": "Seed treatment and foliar spray with Neem Seed Kernel Extract.",
+      "materials": "NSKE.",
+      "dosage": "5% NSKE solution."
+    },
+    "chemical_treatment": {
+      "product": "Zineb",
+      "active_ingredient": "Zineb 75% WP",
+      "dosage": "2g per liter of water."
+    },
+    "prevention": "Use disease-free seeds, long crop rotation, and removal of diseased plant parts.",
+    "recovery_days": 18
+  },
+  {
+    "name": "Cabbage Black Rot",
+    "crop": "Cabbage",
+    "scientific_name": "Xanthomonas campestris pv. campestris",
+    "symptoms": "Yellow, V-shaped lesions starting from leaf margins. Veins within lesions turn black.",
+    "causes": "Bacterial pathogen, warm and wet conditions, infected seeds/seedlings.",
+    "organic_treatment": {
+      "method": "Seed treatment with hot water and foliar spray of Serenade (Bacillus subtilis).",
+      "materials": "Hot water, Bacillus subtilis formulation.",
+      "dosage": "Hot water (50°C) for 30 min; 5ml Serenade per liter."
+    },
+    "chemical_treatment": {
+      "product": "Plantomycin",
+      "active_ingredient": "Streptomycin + Tetracycline",
+      "dosage": "1g per 10 liters of water."
+    },
+    "prevention": "Use certified seeds, 3-year crop rotation (no crucifers), and improve soil drainage.",
+    "recovery_days": 25
+  },
+  {
+    "name": "Coconut Root Wilt",
+    "crop": "Coconut",
+    "scientific_name": "Phytoplasma",
+    "symptoms": "Flaccidity (drooping) of leaflets. Yellowing and marginal necrosis of older leaves. Reduced nut size.",
+    "causes": "Phytoplasma transmitted by Lace wing bug and Plant hopper.",
+    "organic_treatment": {
+      "method": "Basal application of Neem cake and green manuring.",
+      "materials": "Neem cake, Green manure (Gliricidia).",
+      "dosage": "5kg Neem cake per palm per year."
+    },
+    "chemical_treatment": {
+      "product": "Oxytetracycline (Root injection)",
+      "active_ingredient": "Oxytetracycline HCl",
+      "dosage": "2-3g in 25ml water per palm (quarterly)."
+    },
+    "prevention": "Integrated nutrient management, planting tolerant varieties like 'Chowghat Orange Dwarf'.",
+    "recovery_days": 180
+  },
+  {
+    "name": "Tobacco Mosaic",
+    "crop": "Tobacco",
+    "scientific_name": "Tobacco mosaic virus (TMV)",
+    "symptoms": "Mottling, light and dark green patches on leaves. Stunting and leaf distortion.",
+    "causes": "Virus spread through mechanical contact (hands, tools).",
+    "organic_treatment": {
+      "method": "Wash hands/tools with soap; spray milk solution.",
+      "materials": "Soap, Milk.",
+      "dosage": "1:10 ratio of milk to water."
+    },
+    "chemical_treatment": {
+      "product": "Not applicable (Viral)",
+      "active_ingredient": "None",
+      "dosage": "N/A"
+    },
+    "prevention": "Strict sanitation, avoid smoking near plants, use resistant varieties.",
+    "recovery_days": 30
+  },
+  {
+    "name": "Ginger Rhizome Rot",
+    "crop": "Ginger",
+    "scientific_name": "Pythium aphanidermatum",
+    "symptoms": "Yellowing of leaves, stunting, and water-soaked lesions at the base of the pseudostem. Rhizomes become soft and rot.",
+    "causes": "Oomycete pathogen, waterlogging, contaminated rhizomes.",
+    "organic_treatment": {
+      "method": "Rhizome treatment with Trichoderma viride and soil drenching.",
+      "materials": "Trichoderma formulation.",
+      "dosage": "10g Trichoderma per liter of water."
+    },
+    "chemical_treatment": {
+      "product": "Matco",
+      "active_ingredient": "Metalaxyl 8% + Mancozeb 64%",
+      "dosage": "2g per liter of water."
+    },
+    "prevention": "Selection of healthy seeds, solarization of beds, and proper drainage.",
+    "recovery_days": 35
+  },
+  {
+    "name": "Pea Powdery Mildew",
+    "crop": "Pea",
+    "scientific_name": "Erysiphe pisi",
+    "symptoms": "White, powdery patches on leaves, stems, and pods. Leaves turn yellow and brown.",
+    "causes": "Fungal pathogen, dry weather with high humidity at night.",
+    "organic_treatment": {
+      "method": "Spray of wettable sulfur or Neem oil.",
+      "materials": "Sulfur, Neem oil.",
+      "dosage": "3g Sulfur per liter; 5ml Neem oil per liter."
+    },
+    "chemical_treatment": {
+      "product": "Karathane",
+      "active_ingredient": "Dinocap 48% EC",
+      "dosage": "1ml per liter of water."
+    },
+    "prevention": "Early sowing, use of resistant varieties, and avoiding late irrigation.",
+    "recovery_days": 12
+  },
+  {
+    "name": "Sunflower Downy Mildew",
+    "crop": "Sunflower",
+    "scientific_name": "Plasmopara halstedii",
+    "symptoms": "Systemic stunting, chlorosis (yellowing) along leaf veins, and white fungal growth on the underside.",
+    "causes": "Soil-borne and seed-borne oomycete, cool and wet soil conditions.",
+    "organic_treatment": {
+      "method": "Seed treatment with bio-control agents like Pseudomonas fluorescens.",
+      "materials": "Pseudomonas formulation.",
+      "dosage": "10g per kg of seed."
+    },
+    "chemical_treatment": {
+      "product": "Cruiser (Seed treatment)",
+      "active_ingredient": "Thiamethoxam",
+      "dosage": "4ml per kg of seed."
+    },
+    "prevention": "3-year crop rotation, deep plowing, and avoiding waterlogged fields.",
+    "recovery_days": 25
+  },
+  {
+    "name": "Black Pepper Foot Rot",
+    "crop": "Black Pepper",
+    "scientific_name": "Phytophthora capsici",
+    "symptoms": "Dark, water-soaked lesions on the collar region. Leaves turn yellow and drop; vine wilts rapidly.",
+    "causes": "Oomycete pathogen, heavy monsoon rains, poor drainage.",
+    "organic_treatment": {
+      "method": "Application of Trichoderma harzianum and 1% Bordeaux mixture to the base.",
+      "materials": "Trichoderma, Copper sulfate, Lime.",
+      "dosage": "50g Trichoderma in 5kg FYM per vine."
+    },
+    "chemical_treatment": {
+      "product": "Akomin",
+      "active_ingredient": "Potassium Phosphonate",
+      "dosage": "3ml per liter of water (drenching)."
+    },
+    "prevention": "Providing proper drainage, avoiding physical injury to the root zone, and rogueing infected vines.",
+    "recovery_days": 45
+  },
+  {
+    "name": "Castor Gray Mold",
+    "crop": "Castor",
+    "scientific_name": "Botrytis cinerea",
+    "symptoms": "Grayish fungal growth on the spikes. Bolls rot and drop prematurely.",
+    "causes": "Continuous rain or high humidity during the flowering stage.",
+    "organic_treatment": {
+      "method": "Foliar spray of Trichoderma viride or Garlic extract.",
+      "materials": "Trichoderma, Garlic.",
+      "dosage": "5g Trichoderma per liter."
+    },
+    "chemical_treatment": {
+      "product": "Custodia",
+      "active_ingredient": "Azoxystrobin + Tebuconazole",
+      "dosage": "1ml per liter of water."
+    },
+    "prevention": "Removal of infected spikes, avoiding excessive irrigation during flowering.",
+    "recovery_days": 20
+  },
+  {
+    "name": "Jute Stem Rot",
+    "crop": "Jute",
+    "scientific_name": "Macrophomina phaseolina",
+    "symptoms": "Black, sunken lesions on the stem near the soil line. Stem breaks easily; black pycnidia (dots) visible in lesions.",
+    "causes": "Soil-borne fungus, high temperature, and moisture stress.",
+    "organic_treatment": {
+      "method": "Soil application of Neem cake and seed treatment with Trichoderma.",
+      "materials": "Neem cake, Trichoderma.",
+      "dosage": "250kg Neem cake per acre."
+    },
+    "chemical_treatment": {
+      "product": "Captan",
+      "active_ingredient": "Captan 50% WP",
+      "dosage": "2g per liter of water."
+    },
+    "prevention": "Liming of acidic soils, crop rotation with paddy, and balanced NPK.",
+    "recovery_days": 28
+  },
+  {
+    "name": "Cardamom Azhukal (Fruit Rot)",
+    "crop": "Cardamom",
+    "scientific_name": "Phytophthora meadii",
+    "symptoms": "Water-soaked lesions on leaves and berries. Berries rot and drop; leaves decay.",
+    "causes": "Fungal pathogen, heavy rainfall, high humidity, and thick shade.",
+    "organic_treatment": {
+      "method": "Spray and drench with 1% Bordeaux mixture.",
+      "materials": "Copper sulfate, Lime.",
+      "dosage": "1kg each per 100 liters water."
+    },
+    "chemical_treatment": {
+      "product": "Galben R",
+      "active_ingredient": "Benalaxyl + Copper Oxychloride",
+      "dosage": "3g per liter of water."
+    },
+    "prevention": "Regulating shade, providing drainage, and cleaning the plant base before monsoon.",
+    "recovery_days": 30
+  },
+  {
+    "name": "Rose Dieback",
+    "crop": "Rose",
+    "scientific_name": "Lasiodiplodia theobromae",
+    "symptoms": "Blackening of stems starting from the pruned tip downwards. Stem becomes shriveled and dry.",
+    "causes": "Fungal infection through pruning wounds, nutrient deficiency.",
+    "organic_treatment": {
+      "method": "Apply Cow dung paste with Copper oxychloride to pruned tips.",
+      "materials": "Cow dung, Blitox.",
+      "dosage": "Paste consistency."
+    },
+    "chemical_treatment": {
+      "product": "Bavistin",
+      "active_ingredient": "Carbendazim 50% WP",
+      "dosage": "2g per liter of water."
+    },
+    "prevention": "Pruning at a 45-degree angle, using sharp and sanitized tools, and balanced fertilization.",
+    "recovery_days": 25
+  },
+  {
+    "name": "Cucumber Mosaic",
+    "crop": "Cucumber",
+    "scientific_name": "Cucumber mosaic virus (CMV)",
+    "symptoms": "Mosaic patterns of light and dark green on leaves. Leaves become small and distorted. Fruits are 'warty' and bitter.",
+    "causes": "Virus transmitted by aphids.",
+    "organic_treatment": {
+      "method": "Aphid control with Neem oil; use of yellow sticky traps.",
+      "materials": "Neem oil, sticky traps.",
+      "dosage": "5ml Neem oil per liter."
+    },
+    "chemical_treatment": {
+      "product": "None for virus; Acetamiprid for aphids.",
+      "active_ingredient": "Acetamiprid 20% SP",
+      "dosage": "0.5g per liter."
+    },
+    "prevention": "Eliminating weed hosts, using reflective mulches.",
+    "recovery_days": 20
+  },
+  {
+    "name": "Chillies Anthracnose (Fruit Rot)",
+    "crop": "Chili",
+    "scientific_name": "Colletotrichum capsici",
+    "symptoms": "Circular black, sunken spots on fruits with concentric rings. Fruits dry up and shrivel.",
+    "causes": "Seed-borne and air-borne fungus, high humidity.",
+    "organic_treatment": {
+      "method": "Seed treatment with Pseudomonas and spray of Neem oil.",
+      "materials": "Pseudomonas formulation, Neem oil.",
+      "dosage": "10g Pseudomonas/kg seed; 5ml Neem oil per liter."
+    },
+    "chemical_treatment": {
+      "product": "Amistar Top",
+      "active_ingredient": "Azoxystrobin + Difenoconazole",
+      "dosage": "1ml per liter of water."
+    },
+    "prevention": "Use healthy seeds, remove infected fruits, and avoid overhead irrigation.",
+    "recovery_days": 15
+  },
+  {
+    "name": "Wheat Loose Smut",
+    "crop": "Wheat",
+    "scientific_name": "Ustilago nuda tritici",
+    "symptoms": "Ear heads emerge early; grains are replaced by black powdery mass of spores.",
+    "causes": "Internally seed-borne fungus.",
+    "organic_treatment": {
+      "method": "Solar seed treatment (soaking seeds in water and then drying in hot sun).",
+      "materials": "Water, Sunlight.",
+      "dosage": "Soak for 4 hours; dry on floor for 4 hours in May-June."
+    },
+    "chemical_treatment": {
+      "product": "Vitarvax",
+      "active_ingredient": "Carboxin 75% WP",
+      "dosage": "2g per kg of seed."
+    },
+    "prevention": "Use certified disease-free seeds and roguing of infected ears.",
+    "recovery_days": 90
+  },
+  {
+    "name": "Paddy Bacterial Leaf Blight",
+    "crop": "Rice",
+    "scientific_name": "Xanthomonas oryzae pv. oryzae",
+    "symptoms": "Yellowish-white wavy lesions starting from leaf tips and margins. Droplets of bacterial ooze (amber colored) may appear.",
+    "causes": "Bacterial pathogen, high nitrogen, heavy rain, and winds.",
+    "organic_treatment": {
+      "method": "Spray of 20% Cow dung slurry or Streptocycline.",
+      "materials": "Fresh cow dung, Streptocycline.",
+      "dosage": "20kg dung in 100L water (filter before spray); 0.1g Strepto/L."
+    },
+    "chemical_treatment": {
+      "product": "Agrimycin-100",
+      "active_ingredient": "Streptomycin + Tetracycline",
+      "dosage": "1g per 10 liters of water."
+    },
+    "prevention": "Avoid flooding, reduce nitrogen application in infected fields, and use resistant varieties like 'BPT 5204'.",
+    "recovery_days": 20
+  },
+  {
+    "name": "Groundnut Bud Necrosis",
+    "crop": "Groundnut",
+    "scientific_name": "Groundnut bud necrosis virus (GBNV)",
+    "symptoms": "Necrotic spots and rings on young leaves. Terminal bud withers and dies. Plants are stunted and bushy.",
+    "causes": "Virus transmitted by Thrips (Frankliniella schultzei).",
+    "organic_treatment": {
+      "method": "Control thrips with Neem oil or Beauveria bassiana.",
+      "materials": "Neem oil, Beauveria formulation.",
+      "dosage": "5ml Neem oil/L; 5g Beauveria/L."
+    },
+    "chemical_treatment": {
+      "product": "Exalt",
+      "active_ingredient": "Spinetoram 11.7% SC",
+      "dosage": "0.8ml per liter of water."
+    },
+    "prevention": "Timely sowing, intercropping with Pearl millet, and high seeding rate.",
+    "recovery_days": 40
+  },
+  {
+    "name": "Cotton Bacterial Blight",
+    "crop": "Cotton",
+    "scientific_name": "Xanthomonas citri pv. malvacearum",
+    "symptoms": "Angular, water-soaked spots on leaves. 'Black arm' phase on stems and 'Boll rot' phase on bolls.",
+    "causes": "Bacterial pathogen, high humidity, and warm weather.",
+    "organic_treatment": {
+      "method": "Seed treatment with acid delinting and foliar spray of Pseudomonas.",
+      "materials": "Concentrated H2SO4 (for delinting), Pseudomonas fluorescens.",
+      "dosage": "10g Pseudomonas per liter."
+    },
+    "chemical_treatment": {
+      "product": "Streptocycline",
+      "active_ingredient": "Streptomycin sulfate",
+      "dosage": "0.1g per liter of water."
+    },
+    "prevention": "Removal of crop stalks, using resistant varieties, and seed treatment.",
+    "recovery_days": 20
+  },
+  {
+    "name": "Potato Soft Rot",
+    "crop": "Potato",
+    "scientific_name": "Erwinia carotovora",
+    "symptoms": "Water-soaked lesions on tubers that rapidly turn into soft, mushy, foul-smelling mass.",
+    "causes": "Bacterial pathogen, high soil moisture, poor storage ventilation.",
+    "organic_treatment": {
+      "method": "Drying tubers in shade and ensuring proper storage ventilation.",
+      "materials": "None.",
+      "dosage": "N/A"
+    },
+    "chemical_treatment": {
+      "product": "Boric Acid",
+      "active_ingredient": "Boric Acid",
+      "dosage": "3% solution (pre-storage dip)."
+    },
+    "prevention": "Avoid bruising during harvest, store in cool and dry conditions, and improve field drainage.",
+    "recovery_days": 15
+  },
+  {
+    "name": "Citrus Greening (HLB)",
+    "crop": "Citrus",
+    "scientific_name": "Candidatus Liberibacter asiaticus",
+    "symptoms": "Mottled yellowing of leaves (blotchy mottle). Fruits are small, lopsided, and remain green at the bottom. Bitter juice.",
+    "causes": "Bacteria transmitted by Citrus Psyllid (Diaphorina citri).",
+    "organic_treatment": {
+      "method": "Psyllid control with Neem oil and integrated nutrient management.",
+      "materials": "Neem oil, balanced micronutrients.",
+      "dosage": "5ml Neem oil/L."
+    },
+    "chemical_treatment": {
+      "product": "Actara (for psyllid control)",
+      "active_ingredient": "Thiamethoxam 25% WG",
+      "dosage": "0.5g per liter of water."
+    },
+    "prevention": "Use of disease-free nursery plants, rigorous control of the vector psyllid.",
+    "recovery_days": 365
+  },
+  {
+    "name": "Mango Malformation",
+    "crop": "Mango",
+    "scientific_name": "Fusarium mangiferae",
+    "symptoms": "Bunchy appearance of vegetative shoots and floral panicles ('Witch's broom'). Flowers fail to set fruit.",
+    "causes": "Fungal pathogen, mite association (Aceria mangiferae).",
+    "organic_treatment": {
+      "method": "Pruning of malformed parts and spray of Neem oil for mites.",
+      "materials": "Neem oil.",
+      "dosage": "5ml per liter."
+    },
+    "chemical_treatment": {
+      "product": "NAA (Planofix)",
+      "active_ingredient": "Naphthalene Acetic Acid",
+      "dosage": "200 ppm (0.5ml per liter) in October."
+    },
+    "prevention": "Removal and burning of malformed panicles, proper pruning.",
+    "recovery_days": 180
+  },
+  {
+    "name": "Banana Wilt (Panama Disease)",
+    "crop": "Banana",
+    "scientific_name": "Fusarium oxysporum f. sp. cubense",
+    "symptoms": "Yellowing of leaf margins of older leaves. Pseudostem splitting and reddish-brown discoloration of the rhizome.",
+    "causes": "Soil-borne fungus, infected suckers.",
+    "organic_treatment": {
+      "method": "Corm injection and soil drenching with Pseudomonas fluorescens.",
+      "materials": "Pseudomonas formulation.",
+      "dosage": "3g Pseudomonas in 5ml water for corm injection."
+    },
+    "chemical_treatment": {
+      "product": "Vincit",
+      "active_ingredient": "Flutriafol",
+      "dosage": "Soil drenching."
+    },
+    "prevention": "Using resistant varieties like 'Grand Naine', flood fallowing, and crop rotation with paddy.",
+    "recovery_days": 120
+  },
+  {
+    "name": "Coconut Bud Rot",
+    "crop": "Coconut",
+    "scientific_name": "Phytophthora palmivora",
+    "symptoms": "Yellowing of the youngest leaf (spear leaf), which later withers and falls. The bud rots and emits a foul smell.",
+    "causes": "Fungal pathogen, high humidity, and heavy rainfall.",
+    "organic_treatment": {
+      "method": "Removal of dead tissues and application of Bordeaux paste.",
+      "materials": "Copper sulfate, Lime.",
+      "dosage": "Paste consistency."
+    },
+    "chemical_treatment": {
+      "product": "Fytolan",
+      "active_ingredient": "Copper Oxychloride 50% WP",
+      "dosage": "3g per liter of water."
+    },
+    "prevention": "Prophylactic spray of 1% Bordeaux mixture before monsoon, cleaning the crown.",
+    "recovery_days": 90
+  },
+  {
+    "name": "Sugarcane Smut",
+    "crop": "Sugarcane",
+    "scientific_name": "Sporisorium scitamineum",
+    "symptoms": "Production of a black, whip-like structure from the terminal bud. Stunted growth and thin canes.",
+    "causes": "Infected setts, wind-borne spores.",
+    "organic_treatment": {
+      "method": "Rogueing and burning of infected whips; sett treatment with Trichoderma.",
+      "materials": "Trichoderma formulation.",
+      "dosage": "10g per liter of water."
+    },
+    "chemical_treatment": {
+      "product": "Propiconazole (Seed treatment)",
+      "active_ingredient": "Propiconazole 25% EC",
+      "dosage": "1ml per liter (soak for 15 min)."
+    },
+    "prevention": "Selection of smut-free setts, hot water treatment, and resistant varieties.",
+    "recovery_days": 60
+  },
+  {
+    "name": "Tea Blister Blight",
+    "crop": "Tea",
+    "scientific_name": "Exobasidium vexans",
+    "symptoms": "Transparent or pale-yellow spots on leaves. Spots enlarge and form 'blisters' with white powdery growth on the underside.",
+    "causes": "Fungal pathogen, high humidity (>90%), mist, and cool weather.",
+    "organic_treatment": {
+      "method": "Spray of 0.1% Copper oxychloride mixed with Nickel chloride.",
+      "materials": "Blitox, Nickel chloride.",
+      "dosage": "2g Copper + 1g Nickel per liter."
+    },
+    "chemical_treatment": {
+      "product": "Hexastop",
+      "active_ingredient": "Hexaconazole 5% EC",
+      "dosage": "1ml per liter of water."
+    },
+    "prevention": "Removal of overhanging shade trees, timely pruning, and avoiding plucking during heavy mist.",
+    "recovery_days": 15
+  },
+  {
+    "name": "Guava Wilt",
+    "crop": "Guava",
+    "scientific_name": "Fusarium oxysporum f. psidii",
+    "symptoms": "Yellowing and wilting of leaves. Premature shedding and death of branches, eventually leading to the death of the tree.",
+    "causes": "Soil-borne fungus, alkaline soil, poor drainage.",
+    "organic_treatment": {
+      "method": "Soil application of Neem cake and Trichoderma enrichment.",
+      "materials": "Neem cake, Trichoderma harzianum, FYM.",
+      "dosage": "5kg Neem cake + 50g Trichoderma per tree."
+    },
+    "chemical_treatment": {
+      "product": "Benomyl (Drenching)",
+      "active_ingredient": "Benomyl 50% WP",
+      "dosage": "2g per liter of water."
+    },
+    "prevention": "Maintain soil pH (6.5), avoid root injury, and provide adequate drainage.",
+    "recovery_days": 150
+  },
+  {
+    "name": "Coffee Berry Disease",
+    "crop": "Coffee",
+    "scientific_name": "Colletotrichum kahawae",
+    "symptoms": "Dark, sunken spots on green berries. Berries shrivel, turn black, and drop.",
+    "causes": "Fungal pathogen, high altitude, high humidity, and cool temperatures.",
+    "organic_treatment": {
+      "method": "Spray of 1% Bordeaux mixture.",
+      "materials": "Copper sulfate, Lime.",
+      "dosage": "1kg each per 100 liters water."
+    },
+    "chemical_treatment": {
+      "product": "Propi",
+      "active_ingredient": "Propiconazole 25% EC",
+      "dosage": "1ml per liter of water."
+    },
+    "prevention": "Pruning for better air circulation, removal of 'mummified' berries from the ground.",
+    "recovery_days": 30
+  },
+  {
+    "name": "Papaya Mealybug",
+    "crop": "Papaya",
+    "scientific_name": "Paracoccus marginatus",
+    "symptoms": "White waxy mass on leaves, fruits, and stems. Distorted leaves and black sooty mold growth.",
+    "causes": "Insect pest infestation, spread by ants.",
+    "organic_treatment": {
+      "method": "Release of Acerophagus papayae (parasitoid) or Neem oil spray.",
+      "materials": "Neem oil, soap solution.",
+      "dosage": "5ml Neem oil per liter."
+    },
+    "chemical_treatment": {
+      "product": "Movento",
+      "active_ingredient": "Spirotetramat 15.31% OD",
+      "dosage": "2ml per liter of water."
+    },
+    "prevention": "Destruction of alternative weed hosts, controlling ants with grease bands on the trunk.",
+    "recovery_days": 21
+  }
+]
