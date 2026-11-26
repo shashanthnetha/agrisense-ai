@@ -128,6 +128,7 @@ def _call_model(processed_bytes: bytes) -> str:
     image_part = {"mime_type": "image/jpeg", "data": processed_bytes}
     response = model.generate_content(
         [VISION_PROMPT, image_part],
+        generation_config={"max_output_tokens": settings.MAX_OUTPUT_TOKENS_DETECTION},
         request_options={"timeout": MODEL_TIMEOUT_SECONDS},
     )
     return response.text
