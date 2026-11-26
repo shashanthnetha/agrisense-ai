@@ -55,7 +55,10 @@ def _load():
     pc = Pinecone(api_key=settings.PINECONE_API_KEY)
     index = pc.Index(settings.PINECONE_INDEX_NAME)
     try:
-        _metric = str(pc.describe_index(settings.PINECONE_INDEX_NAME).metric).lower()
+        desc = pc.describe_index(settings.PINECONE_INDEX_NAME)
+        # Integrated-embedding indexes report the metric under .embed
+        metric = getattr(desc, "metric", None) or getattr(getattr(desc, "embed", None), "metric", None)
+        _metric = str(metric).lower() if metric else None
     except Exception as e:
         logger.warning("Could not read Pinecone index metric: %s", type(e).__name__)
         _metric = None
