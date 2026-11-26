@@ -1,7 +1,7 @@
 import json
 import logging
 from pinecone import Pinecone
-from sentence_transformers import SentenceTransformer
+from app.services.rag import _Embedder
 from app.core.config import settings
 
 logging.basicConfig(level=logging.INFO)
@@ -16,7 +16,7 @@ def seed_pinecone():
         # or we could attempt creation but usually needs dimensions
         index = pc.Index(index_name)
         
-        embedder = SentenceTransformer('all-MiniLM-L6-v2')
+        embedder = _Embedder()
         
         with open('diseases.json', 'r') as f:
             diseases = json.load(f)
