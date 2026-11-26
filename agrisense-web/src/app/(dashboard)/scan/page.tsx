@@ -17,16 +17,26 @@ export default function ScanPage() {
   const [result, setResult] = useState<ScanResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [language, setLanguage] = useState("English");
+  const [error, setError] = useState<string | null>(null);
+  const [lastFile, setLastFile] = useState<File | null>(null);
 
   const handleUpload = async (file: File) => {
     setIsLoading(true);
+    setError(null);
+    setLastFile(file);
     try {
       const data = await analyzeCrop(file, language);
+      if (!data || (data.status !== "healthy" && data.status !== "disease_detected")) {
+        throw new Error("Unexpected response from server");
+      }
       setResult(data);
       toast.success("Analysis complete!");
     } catch (error: any) {
       console.error(error);
-      toast.error(error.response?.data?.detail || "Failed to analyze image. Please try again.");
+      setError(
+        error.response?.data?.detail ||
+          "We could not analyze this image. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -34,6 +44,7 @@ export default function ScanPage() {
 
   const reset = () => {
     setResult(null);
+    setError(null);
   };
 
   return (
@@ -69,6 +80,27 @@ export default function ScanPage() {
               </div>
 
               <ImageUploader onUpload={handleUpload} isLoading={isLoading} />
+
+              {error && (
+                <div
+                  role="alert"
+                  className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-800 space-y-3"
+                >
+                  <p className="font-semibold">Analysis failed</p>
+                  <p>{error}</p>
+                  {lastFile && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={isLoading}
+                      onClick={() => handleUpload(lastFile)}
+                      className="gap-2 border-red-300 text-red-800 hover:bg-red-100"
+                    >
+                      <RefreshCcw className="h-3 w-3" /> Try again
+                    </Button>
+                  )}
+                </div>
+              )}
               
               <div className="bg-white p-6 rounded-2xl border border-slate-100 space-y-4">
                 <h3 className="font-bold text-slate-800 flex items-center gap-2">
