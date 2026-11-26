@@ -43,7 +43,7 @@ Upload a photo of a diseased leaf → get an AI-assisted diagnosis, treatment pl
 | 📸 Upload leaf photo | Farmer takes/uploads image |
 | 🧠 AI analyzes | Gemini Vision detects disease |
 | 📊 Results shown | Disease name, confidence, symptoms |
-| 💊 Treatment plan | Organic + chemical options |
+| 💊 Treatment plan | Organic and prevention guidance (chemical advice withheld, see below) |
 | 🔊 Voice report | ElevenLabs speaks in Telugu/Hindi |
 
 ---
@@ -51,7 +51,7 @@ Upload a photo of a diseased leaf → get an AI-assisted diagnosis, treatment pl
 ## ✨ Features
 
 - 🔍 **AI Disease Detection** — Gemini vision analyzes a leaf photo (model set by `GEMINI_MODEL`)
-- 📋 **Complete Treatment Plans** — Organic AND chemical options with dosage
+- 📋 **Complete Treatment Plans** — Organic and prevention guidance. Chemical products and doses are not shown: the knowledge base has no source for them
 - 🔊 **Multilingual Voice Reports** — English, Hindi, Telugu, Tamil via ElevenLabs
 - 🧠 **RAG-Powered Knowledge** — Pinecone vector database seeded with 50 diseases
 - 📱 **Mobile-First Design** — Responsive layout checked in desktop and 390px mobile Chrome (not yet on real phones)
