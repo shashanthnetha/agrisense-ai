@@ -24,6 +24,20 @@ class Settings(BaseSettings):
     PINECONE_INDEX_NAME: str
     ELEVENLABS_API_KEY: str
     
+    # Paid endpoints refuse every call unless this is set and the caller sends it (X-Access-Key)
+    ACCESS_KEY: Optional[str] = None
+
+    # Usage limits (in-memory safety nets for paid or quota-limited APIs)
+    SCANS_PER_IP_PER_HOUR: int = 5
+    DAILY_SCAN_CAP: int = 100
+    MONTHLY_VOICE_CAP: int = 15
+    MAX_UPLOAD_MB: int = 8
+    # Output caps for every Gemini call (bounds cost per call)
+    MAX_OUTPUT_TOKENS_DETECTION: int = 1200
+    MAX_OUTPUT_TOKENS_TREATMENT: int = 2000
+    MAX_OUTPUT_TOKENS_TRANSLATION: int = 800
+    MAX_VOICE_CHARS: int = 800
+
     # AWS
     AWS_ACCESS_KEY_ID: Optional[str] = None
     AWS_SECRET_ACCESS_KEY: Optional[str] = None
