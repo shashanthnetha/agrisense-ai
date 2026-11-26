@@ -2,90 +2,87 @@
 
 import React from 'react';
 import { Analysis } from '@/lib/types';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { AlertCircle, CheckCircle2, AlertTriangle, Info } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, ChevronDown } from 'lucide-react';
 
 interface AnalysisResultsProps {
   analysis: Analysis;
 }
 
-export function AnalysisResults({ analysis }: AnalysisResultsProps) {
-  const urgencyColors = {
-    Low: 'bg-green-100 text-green-800 border-green-200',
-    Medium: 'bg-orange-100 text-orange-800 border-orange-200',
-    High: 'bg-red-100 text-red-800 border-red-200',
-    Critical: 'bg-red-200 text-red-900 border-red-300 animate-pulse',
-  };
+const URGENCY_STYLE: Record<string, string> = {
+  Low: 'bg-green-100 text-green-800',
+  Medium: 'bg-amber-100 text-amber-900',
+  High: 'bg-red-100 text-red-800',
+  Critical: 'bg-red-700 text-white',
+};
 
-  const UrgencyIcon = {
-    Low: CheckCircle2,
-    Medium: Info,
-    High: AlertTriangle,
-    Critical: AlertCircle,
-  }[analysis.urgency] || AlertTriangle;
+export function AnalysisResults({ analysis }: AnalysisResultsProps) {
+  const sick = analysis.disease_detected;
+  const symptoms: string[] = analysis.visible_symptoms || [];
 
   return (
-    <Card className="w-full border-green-100 overflow-hidden">
-      <div className={`h-2 w-full ${analysis.disease_detected ? 'bg-red-500' : 'bg-green-500'}`} />
-      <CardHeader className="pb-2">
-        <div className="flex justify-between items-start mb-2">
-          <Badge variant="outline" className="text-xs uppercase tracking-wider font-semibold">
+    <section aria-labelledby="diagnosis-heading" className="overflow-hidden rounded-3xl border bg-white shadow-sm">
+      <div className={`px-5 py-5 ${sick ? 'bg-red-50' : 'bg-green-50'}`}>
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="rounded-full border border-slate-300 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-700">
             {analysis.crop_type}
-          </Badge>
-          <Badge className={`${urgencyColors[analysis.urgency]} flex items-center gap-1`}>
-            <UrgencyIcon className="h-3 w-3" />
-            {analysis.urgency} Urgency
-          </Badge>
-        </div>
-        <CardTitle className="text-2xl font-bold flex items-center gap-2">
-          {analysis.disease_detected ? (
-            <>
-              <AlertTriangle className="text-red-500 h-6 w-6" />
-              {analysis.disease_name}
-            </>
-          ) : (
-            <>
-              <CheckCircle2 className="text-green-500 h-6 w-6" />
-              Healthy Crop
-            </>
+          </span>
+          {sick && (
+            <span className={`rounded-full px-3 py-1 text-xs font-semibold ${URGENCY_STYLE[analysis.urgency] ?? URGENCY_STYLE.Medium}`}>
+              {analysis.urgency} urgency
+            </span>
           )}
-        </CardTitle>
-        <CardDescription className="text-base">
-          Model confidence: {analysis.confidence}% (self-reported estimate, not verified accuracy)
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6 pt-4">
-        <div className="space-y-2">
-          <div className="flex justify-between text-sm font-medium">
-            <span>Affected Area</span>
-            <span>{analysis.affected_area_percent}%</span>
+        </div>
+        <h2 id="diagnosis-heading" className="mt-3 flex items-start gap-2 text-2xl font-extrabold text-slate-900">
+          {sick ? (
+            <AlertTriangle className="mt-1 h-6 w-6 shrink-0 text-red-600" aria-hidden />
+          ) : (
+            <CheckCircle2 className="mt-1 h-6 w-6 shrink-0 text-green-700" aria-hidden />
+          )}
+          <span>{sick ? analysis.disease_name : 'No disease found'}</span>
+        </h2>
+        <p className="mt-1 text-sm text-slate-600">
+          {sick
+            ? 'This is an AI estimate from one photo. Confirm with a local agriculture officer before spraying.'
+            : 'The leaf looks healthy in this photo. Re-scan if symptoms appear.'}
+        </p>
+      </div>
+
+      <dl className={`grid divide-x border-y text-center ${sick ? 'grid-cols-2' : 'grid-cols-1'}`}>
+        <div className="px-3 py-3">
+          <dt className="text-xs text-slate-500">Model confidence</dt>
+          <dd className="text-lg font-bold text-slate-900">{Math.round(analysis.confidence)}%</dd>
+          <dd className="text-[11px] text-slate-400">self-reported, not verified</dd>
+        </div>
+        {sick && (
+          <div className="px-3 py-3">
+            <dt className="text-xs text-slate-500">Affected area</dt>
+            <dd className="text-lg font-bold text-slate-900">{Math.round(analysis.affected_area_percent)}%</dd>
+            <dd className="text-[11px] text-slate-400">of the visible leaf</dd>
           </div>
-          <Progress value={analysis.affected_area_percent} className="h-2 bg-slate-100" />
-        </div>
+        )}
+      </dl>
 
-        <div className="space-y-3">
-          <h4 className="font-bold text-sm uppercase tracking-wider text-slate-500 flex items-center gap-2">
-            <Info className="h-4 w-4" /> Visible Symptoms
-          </h4>
-          <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
-            {((analysis as any).visible_symptoms || (analysis as any).symptoms || []).map((symptom: string, idx: number) => (
-              <li key={idx} className="flex items-center gap-2 text-sm bg-slate-50 p-3 rounded-xl border border-slate-100">
-                <div className="h-1.5 w-1.5 rounded-full bg-primary" />
-                {symptom}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="bg-green-50/50 p-4 rounded-xl border border-green-100">
-          <h4 className="font-bold text-sm uppercase tracking-wider text-green-700 mb-2">Expert Reasoning</h4>
-          <p className="text-sm text-green-800 leading-relaxed italic">
-            "{analysis.reasoning}"
-          </p>
-        </div>
-      </CardContent>
-    </Card>
+      {(symptoms.length > 0 || analysis.reasoning) && (
+        <details className="group px-5 py-4">
+          <summary className="flex cursor-pointer list-none items-center justify-between text-sm font-semibold text-slate-800">
+            Why this result
+            <ChevronDown className="h-4 w-4 transition-transform group-open:rotate-180" aria-hidden />
+          </summary>
+          <div className="mt-3 space-y-3">
+            {symptoms.length > 0 && (
+              <ul className="space-y-2">
+                {symptoms.map((s, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
+                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-green-700" aria-hidden />
+                    {s}
+                  </li>
+                ))}
+              </ul>
+            )}
+            {analysis.reasoning && <p className="rounded-xl bg-slate-50 p-3 text-sm leading-relaxed text-slate-600">{analysis.reasoning}</p>}
+          </div>
+        </details>
+      )}
+    </section>
   );
 }
