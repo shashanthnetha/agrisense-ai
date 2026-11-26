@@ -4,7 +4,7 @@ import base64
 import logging
 from app.services.detection import analyze_image, AnalysisError
 from app.services.rag import query_disease_knowledge
-from app.services.treatment import generate_treatment
+from app.services.treatment import generate_treatment, TreatmentError
 from app.services.voice import generate_voice
 
 # Heuristic cut-off on the model's own self-reported confidence (0-100).
@@ -61,7 +61,17 @@ async def analyze_crop(
             crop=analysis.get("crop_type")
         )
         
-        treatment = await generate_treatment(analysis, rag_context)
+        try:
+            treatment = await generate_treatment(analysis, rag_context)
+        except TreatmentError:
+            # Keep the diagnosis; say plainly that the treatment plan is unavailable.
+            return {
+                "status": "disease_detected",
+                "analysis": analysis,
+                "treatment": None,
+                "treatment_message": "Treatment advice is unavailable right now. Please try again, or ask a local agriculture officer.",
+                "voice_data": None,
+            }
         voice_bytes = await generate_voice(analysis, treatment, language)
         
         voice_base64 = None
