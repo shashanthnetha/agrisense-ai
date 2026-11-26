@@ -152,8 +152,8 @@ export function TreatmentPlan({ treatment }: TreatmentPlanProps) {
           </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col items-center py-4">
-          <p className="text-2xl font-black text-green-600 text-center">{treatment.recovery_timeline}</p>
-          <p className="text-xs text-slate-500 mt-1">Expected Recovery Period</p>
+          <p className="text-base font-semibold text-slate-600 text-center">{treatment.recovery_timeline}</p>
+          <p className="text-xs text-slate-500 mt-1">No recovery forecast is given</p>
         </CardContent>
       </Card>
 
