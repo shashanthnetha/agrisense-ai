@@ -18,16 +18,28 @@ export default function ScanPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [language, setLanguage] = useState("English");
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [lastFile, setLastFile] = useState<File | null>(null);
 
   const handleUpload = async (file: File) => {
     setIsLoading(true);
     setError(null);
+    setNotice(null);
     setLastFile(file);
     try {
       const data = await analyzeCrop(file, language);
-      if (!data || (data.status !== "healthy" && data.status !== "disease_detected")) {
+      if (
+        !data ||
+        !["healthy", "disease_detected", "not_a_plant", "uncertain"].includes(data.status)
+      ) {
         throw new Error("Unexpected response from server");
+      }
+      if (data.status === "not_a_plant" || data.status === "uncertain") {
+        setNotice(
+          data.message ||
+            "We could not give a reliable result for this photo. Please try a clearer photo."
+        );
+        return;
       }
       setResult(data);
       toast.success("Analysis complete!");
@@ -45,6 +57,7 @@ export default function ScanPage() {
   const reset = () => {
     setResult(null);
     setError(null);
+    setNotice(null);
   };
 
   return (
@@ -80,6 +93,16 @@ export default function ScanPage() {
               </div>
 
               <ImageUploader onUpload={handleUpload} isLoading={isLoading} />
+
+              {notice && (
+                <div
+                  role="status"
+                  className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 space-y-1"
+                >
+                  <p className="font-semibold">No reliable result</p>
+                  <p>{notice}</p>
+                </div>
+              )}
 
               {error && (
                 <div
