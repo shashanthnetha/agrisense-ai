@@ -7,6 +7,10 @@ from app.services.rag import query_disease_knowledge
 from app.services.treatment import generate_treatment
 from app.services.voice import generate_voice
 
+# Heuristic cut-off on the model's own self-reported confidence (0-100).
+# This number is not calibrated against labelled data; treat it as a safety net.
+MIN_CONFIDENCE = 50
+
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
@@ -18,6 +22,25 @@ async def analyze_crop(
     try:
         contents = await image.read()
         analysis = await analyze_image(contents)
+
+        if analysis.get("is_plant") is False:
+            return {
+                "status": "not_a_plant",
+                "message": "This does not look like a plant or leaf. Please upload a clear photo of the affected crop.",
+                "analysis": analysis,
+                "treatment": None,
+                "voice_data": None,
+            }
+
+        confidence = analysis.get("confidence")
+        if isinstance(confidence, (int, float)) and confidence < MIN_CONFIDENCE:
+            return {
+                "status": "uncertain",
+                "message": "We are not confident about this diagnosis. Please retake the photo in good light, close to a single affected leaf.",
+                "analysis": analysis,
+                "treatment": None,
+                "voice_data": None,
+            }
 
         # Only an explicit disease_detected == False is a healthy result.
         if not isinstance(analysis.get("disease_detected"), bool):
