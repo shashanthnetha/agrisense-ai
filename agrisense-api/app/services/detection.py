@@ -9,6 +9,14 @@ import io
 
 logger = logging.getLogger(__name__)
 
+
+class AnalysisError(Exception):
+    """Raised when the image analysis fails or returns unusable output.
+
+    This is deliberately different from a valid "no disease detected" result,
+    so a failed analysis is never reported to the user as a healthy crop.
+    """
+
 genai.configure(api_key=settings.GEMINI_API_KEY)
 
 VISION_PROMPT = """
@@ -60,30 +68,42 @@ def preprocess_image(image_bytes: bytes):
         logger.error(f"Image preprocessing error: {e}")
         return image_bytes
 
+def parse_analysis(text: str) -> dict:
+    """Parse and minimally validate the model's JSON output.
+
+    Raises AnalysisError if the output is not a JSON object with a boolean
+    `disease_detected` field.
+    """
+    text = (text or "").strip()
+    if "```json" in text:
+        text = text.split("```json")[1].split("```")[0].strip()
+    try:
+        analysis = json.loads(text)
+    except json.JSONDecodeError as e:
+        raise AnalysisError("Model output was not valid JSON") from e
+    if not isinstance(analysis, dict):
+        raise AnalysisError("Model output was not a JSON object")
+    if not isinstance(analysis.get("disease_detected"), bool):
+        raise AnalysisError("Model output is missing a boolean disease_detected")
+    return analysis
+
+
 async def analyze_image(image_bytes: bytes):
     try:
         processed_bytes = preprocess_image(image_bytes)
-        
+
         model = genai.GenerativeModel("gemini-2.5-flash-lite")
-        
+
         image_part = {
             "mime_type": "image/jpeg",
             "data": processed_bytes
         }
-        
+
         response = model.generate_content([VISION_PROMPT, image_part])
-        
-        # Parse JSON from response
-        text = response.text.strip()
-        if "```json" in text:
-            text = text.split("```json")[1].split("```")[0].strip()
-        
-        analysis = json.loads(text)
-        return analysis
+        return parse_analysis(response.text)
+    except AnalysisError:
+        logger.error("Detection service returned unusable output")
+        raise
     except Exception as e:
         logger.error(f"Detection service error: {e}")
-        return {
-            "disease_detected": False,
-            "error": "Failed to analyze image",
-            "details": str(e)
-        }
+        raise AnalysisError("Image analysis failed") from e
