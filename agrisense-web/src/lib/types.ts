@@ -32,6 +32,7 @@ export interface ScanResponse {
   message?: string;
   analysis: Analysis;
   treatment: Treatment | null;
+  treatment_message?: string;
   voice_data: string | null; // base64 string
 }
 
