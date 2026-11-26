@@ -31,10 +31,12 @@ async def generate_voice(analysis: dict, treatment: dict, language: str = "Engli
             model = genai.GenerativeModel(settings.GEMINI_MODEL)
             response = model.generate_content(
                 f"Translate this agricultural report to {LANGUAGE_NAMES[language]}. "
-                f"Keep it natural and clear for farmers. Only return the translated text, nothing else:\n\n{script}"
+                f"Keep it natural and clear for farmers. Only return the translated text, nothing else:\n\n{script}",
+                generation_config={"max_output_tokens": settings.MAX_OUTPUT_TOKENS_TRANSLATION},
             )
             script = response.text
 
+        script = script[: settings.MAX_VOICE_CHARS]
         audio = client.text_to_speech.convert(
             text=script,
             voice_id="ErXwobaYiN019PkySvjV",
