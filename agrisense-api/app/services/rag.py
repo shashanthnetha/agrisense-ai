@@ -32,13 +32,24 @@ def _min_score() -> Optional[float]:
         return None
 
 
+class _Embedder:
+    """all-MiniLM-L6-v2 through ONNX (fastembed): same model and 384-d unit vectors as
+    sentence-transformers, without loading torch (about half the memory)."""
+
+    def __init__(self):
+        from fastembed import TextEmbedding
+        self._model = TextEmbedding("sentence-transformers/all-MiniLM-L6-v2")
+
+    def encode(self, text: str):
+        return next(iter(self._model.embed([text])))
+
+
 def _load():
     """Create the embedder and Pinecone index on first use (not at import time)."""
     global _embedder, _index, _metric
     if _embedder is not None and _index is not None:
         return
     from pinecone import Pinecone
-    from sentence_transformers import SentenceTransformer
     from app.core.config import settings
 
     pc = Pinecone(api_key=settings.PINECONE_API_KEY)
@@ -48,7 +59,7 @@ def _load():
     except Exception as e:
         logger.warning("Could not read Pinecone index metric: %s", type(e).__name__)
         _metric = None
-    _embedder = SentenceTransformer("all-MiniLM-L6-v2")
+    _embedder = _Embedder()
     _index = index
 
 
