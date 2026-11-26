@@ -9,11 +9,8 @@ for key in [
 ]:
     os.environ.setdefault(key, "test")
 
-# Replace the heavy services (Pinecone, sentence-transformers, ElevenLabs) with stubs
+# Replace the heavy services (Gemini treatment, ElevenLabs) with stubs
 # so the scan route can be tested without those packages or any network access.
-async def _rag(disease=None, crop=None):
-    return "ctx"
-
 async def _treatment(analysis, ctx):
     return {"immediate_action": "x"}
 
@@ -21,7 +18,6 @@ async def _voice(analysis, treatment, language):
     return b"audio"
 
 for name, attr, fn in [
-    ("app.services.rag", "query_disease_knowledge", _rag),
     ("app.services.treatment", "generate_treatment", _treatment),
     ("app.services.voice", "generate_voice", _voice),
 ]:
