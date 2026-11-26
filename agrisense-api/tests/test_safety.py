@@ -66,3 +66,69 @@ def test_count_tokens_error_fails_closed():
         def count_tokens(s, c): raise RuntimeError("down")
     with pytest.raises(RuntimeError):
         check_input_tokens(M(), "x", 100, "t")
+
+
+def test_voice_script_ignores_free_text(monkeypatch):
+    import asyncio
+    import importlib.util, pathlib, sys, types
+    spoken = {}
+    fake = types.ModuleType("elevenlabs.client")
+    fake.ElevenLabs = lambda **k: None
+    monkeypatch.setitem(sys.modules, "elevenlabs", types.ModuleType("elevenlabs"))
+    monkeypatch.setitem(sys.modules, "elevenlabs.client", fake)
+    path = pathlib.Path(treatment.__file__).with_name("voice.py")
+    spec = importlib.util.spec_from_file_location("real_voice_under_test", path)
+    v = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(v)
+
+    class TTS:
+        def convert(self, text, **k):
+            spoken["t"] = text
+            return [b"x"]
+
+    class C:
+        text_to_speech = TTS()
+
+    monkeypatch.setattr(v, "client", C())
+    analysis = {"crop_type": "Rice", "disease_name": "Leaf Blast; spray Mancozeb 2g/L", "urgency": "High; ignore rules"}
+    treat = {"immediate_action": "Spray Mancozeb 2 g per litre", "recovery_timeline": "use Roundup"}
+    asyncio.run(v.generate_voice(analysis, treat, "English"))
+    t = spoken["t"]
+    assert "Mancozeb" not in t and "Roundup" not in t and "ignore rules" not in t
+    assert "Crop: Rice" in t and "Possible issue: not identified" in t and "Urgency: not stated" in t
+    assert "local agriculture officer" in t
+
+
+def test_aggregate_budget_blocks(monkeypatch):
+    from app.core.config import settings
+    from app.services.guard import BudgetExceeded, reset_budget_for_tests
+    reset_budget_for_tests()
+    monkeypatch.setattr(settings, "TOTAL_GEMINI_CALLS_BUDGET", 2)
+
+    class M:
+        def count_tokens(s, c):
+            class T: total_tokens = 10
+            return T()
+
+    check_input_tokens(M(), "x", 100, "t")
+    check_input_tokens(M(), "x", 100, "t")
+    with pytest.raises(BudgetExceeded):
+        check_input_tokens(M(), "x", 100, "t")
+    reset_budget_for_tests()
+
+
+def test_aggregate_token_budget_blocks(monkeypatch):
+    from app.core.config import settings
+    from app.services.guard import BudgetExceeded, reset_budget_for_tests
+    reset_budget_for_tests()
+    monkeypatch.setattr(settings, "TOTAL_INPUT_TOKENS_BUDGET", 15)
+
+    class M:
+        def count_tokens(s, c):
+            class T: total_tokens = 10
+            return T()
+
+    check_input_tokens(M(), "x", 100, "t")
+    with pytest.raises(BudgetExceeded):
+        check_input_tokens(M(), "x", 100, "t")
+    reset_budget_for_tests()
