@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { History, ArrowLeft, Sprout, Search } from 'lucide-react';
 
 export default function HistoryPage() {
@@ -47,7 +47,7 @@ export default function HistoryPage() {
               Coming Soon
             </h4>
             <p className="text-xs text-amber-700 leading-relaxed">
-              We're currently building a more advanced history tracking system that includes seasonal trends and farm-wide health reports.
+              We&apos;re currently building a more advanced history tracking system that includes seasonal trends and farm-wide health reports.
             </p>
           </div>
         </div>
