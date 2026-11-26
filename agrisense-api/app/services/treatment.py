@@ -81,7 +81,9 @@ async def generate_treatment(analysis: dict, rag_context: str):
             analysis_json=json.dumps(analysis),
             rag_context=rag_context
         )
-        response = model.generate_content(prompt)
+        response = model.generate_content(
+            prompt, generation_config={"max_output_tokens": settings.MAX_OUTPUT_TOKENS_TREATMENT}
+        )
         return parse_treatment(response.text)
     except TreatmentError:
         logger.error("Treatment generation returned an unusable plan")
