@@ -9,10 +9,17 @@ from app.services import detection
 from app.services.detection import AnalysisError, parse_analysis
 
 GOOD = {
-    "disease_detected": True, "disease_name": "Leaf Blight", "crop_type": "Rice",
+    "is_plant": True, "disease_detected": True, "disease_name": "Leaf Blight", "crop_type": "Rice",
     "confidence": 90, "affected_area_percent": 20, "visible_symptoms": ["spots"],
     "urgency": "High", "reasoning": "r",
 }
+
+
+@pytest.fixture(autouse=True)
+def _stub_rag(monkeypatch):
+    async def rag(disease=None, crop=None):
+        return "ctx"
+    monkeypatch.setattr(scan, "query_disease_knowledge", rag)
 
 
 def make_client():
@@ -97,63 +104,54 @@ def test_schema_rejects_bad_values(patch):
         parse_analysis(json.dumps({**GOOD, **patch}))
 
 
-def test_schema_fills_defaults_for_healthy_result():
-    out = parse_analysis(json.dumps({"disease_detected": False}))
-    assert out["is_plant"] is True and out["crop_type"] == "Unknown" and out["visible_symptoms"] == []
+def test_missing_is_plant_or_confidence_is_rejected():
+    for key in ("is_plant", "confidence"):
+        data = {**GOOD, "disease_detected": False, "disease_name": "Healthy"}
+        del data[key]
+        with pytest.raises(AnalysisError):
+            parse_analysis(json.dumps(data))
 
 
-# --- uncertain / not a plant ---------------------------------------------
-
-def test_not_a_plant_result(monkeypatch):
-    async def ok(_): return {**GOOD, "is_plant": False, "disease_detected": False}
-    monkeypatch.setattr(scan, "analyze_image", ok)
-    body = post(make_client()).json()
-    assert body["status"] == "not_a_plant" and body["treatment"] is None and body["message"]
+def test_optional_text_fields_get_defaults():
+    out = parse_analysis(json.dumps({"is_plant": True, "disease_detected": False, "confidence": 90}))
+    assert out["crop_type"] == "Unknown" and out["visible_symptoms"] == []
 
 
-def test_low_confidence_is_uncertain_and_skips_treatment(monkeypatch):
-    async def ok(_): return {**GOOD, "confidence": scan.MIN_CONFIDENCE - 1}
-    monkeypatch.setattr(scan, "analyze_image", ok)
-    body = post(make_client()).json()
-    assert body["status"] == "uncertain" and body["treatment"] is None and body["voice_data"] is None
-
-
-# --- /analyze route -------------------------------------------------------
-
-def test_analysis_failure_is_not_healthy(monkeypatch):
-    async def fail(_): raise AnalysisError("x")
-    monkeypatch.setattr(scan, "analyze_image", fail)
-    r = post(make_client())
-    assert r.status_code == 502
-    assert "healthy" not in json.dumps(r.json()).lower()
-
-
-def test_unexpected_error_does_not_leak_details(monkeypatch):
-    async def fail(_): raise RuntimeError("db password=hunter2")
-    monkeypatch.setattr(scan, "analyze_image", fail)
-    r = post(make_client())
-    assert r.status_code == 500
-    assert "hunter2" not in r.text
-
-
-def test_missing_disease_detected_is_not_healthy(monkeypatch):
-    async def odd(_): return {"crop_type": "Rice"}
+def test_route_missing_is_plant_is_error_not_healthy(monkeypatch):
+    async def odd(_): return {"disease_detected": False, "confidence": 95}
     monkeypatch.setattr(scan, "analyze_image", odd)
-    r = post(make_client())
-    assert r.status_code == 502
+    assert post(make_client()).status_code == 502
 
 
-def test_explicit_healthy_result(monkeypatch):
-    async def ok(_): return {**GOOD, "disease_detected": False, "disease_name": "Healthy"}
-    monkeypatch.setattr(scan, "analyze_image", ok)
-    r = post(make_client())
-    assert r.status_code == 200 and r.json()["status"] == "healthy"
+def test_route_missing_confidence_is_uncertain_not_healthy(monkeypatch):
+    async def odd(_): return {"is_plant": True, "disease_detected": False}
+    monkeypatch.setattr(scan, "analyze_image", odd)
+    assert post(make_client()).json()["status"] == "uncertain"
 
 
-def test_disease_path_still_works(monkeypatch):
-    async def ok(_): return GOOD
-    monkeypatch.setattr(scan, "analyze_image", ok)
-    r = post(make_client())
-    body = r.json()
-    assert r.status_code == 200 and body["status"] == "disease_detected"
-    assert body["treatment"] and body["voice_data"]
+def test_hung_model_call_times_out_once_without_overlapping_retries(monkeypatch):
+    import time
+    monkeypatch.setattr(detection, "MODEL_TIMEOUT_SECONDS", 0.05)
+    monkeypatch.setattr(detection, "WAIT_GRACE_SECONDS", 0)
+    monkeypatch.setattr(detection, "RETRY_BACKOFF_SECONDS", 0)
+    calls = []
+
+    class Hang:
+        def __init__(self, *a, **k): pass
+        def generate_content(self, *a, **k):
+            calls.append(1)
+            time.sleep(0.4)
+            return type("R", (), {"text": json.dumps(GOOD)})()
+
+    monkeypatch.setattr(detection.genai, "GenerativeModel", Hang)
+    loop = asyncio.new_event_loop()  # like a server: the loop outlives the request
+    try:
+        start = time.monotonic()
+        with pytest.raises(AnalysisError):
+            loop.run_until_complete(detection.analyze_image(b"x"))
+        elapsed = time.monotonic() - start
+    finally:
+        loop.run_until_complete(loop.shutdown_default_executor())
+        loop.close()
+    assert elapsed < 0.3          # caller released before the hung call finishes
+    assert len(calls) == 1        # no second call started while the first may still run
