@@ -167,6 +167,15 @@ export default function ScanPage() {
               {result.treatment && (
                 <TreatmentPlan treatment={result.treatment} />
               )}
+
+              {result.status === 'disease_detected' && !result.treatment && (
+                <div role="alert" className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+                  <p className="font-bold">Treatment plan unavailable</p>
+                  <p className="mt-1">
+                    {result.treatment_message ?? 'Treatment advice is unavailable right now. Please scan again.'}
+                  </p>
+                </div>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
