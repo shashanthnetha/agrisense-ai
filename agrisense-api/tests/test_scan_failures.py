@@ -29,7 +29,8 @@ def make_client():
 
 
 def post(client):
-    return client.post("/scan/analyze", files={"image": ("a.jpg", b"123", "image/jpeg")})
+    return client.post("/scan/analyze", files={"image": ("a.jpg", b"123", "image/jpeg")},
+                       headers={"X-Access-Key": "test-access-key"})
 
 
 # --- parse_analysis -------------------------------------------------------
