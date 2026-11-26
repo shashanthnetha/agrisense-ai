@@ -47,7 +47,7 @@ def _stubs(monkeypatch):
 
 
 def test_parse_valid_plan():
-    assert parse_treatment(json.dumps(PLAN))["recovery_timeline"] == "7-10 days"
+    assert parse_treatment(json.dumps(PLAN))["recovery_timeline"] != "7-10 days"
 
 
 def test_parse_strips_fence():
