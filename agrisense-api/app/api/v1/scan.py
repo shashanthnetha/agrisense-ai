@@ -23,6 +23,9 @@ async def analyze_crop(
         contents = await image.read()
         analysis = await analyze_image(contents)
 
+        if not isinstance(analysis.get("is_plant"), bool):
+            raise AnalysisError("Analysis is missing is_plant")
+
         if analysis.get("is_plant") is False:
             return {
                 "status": "not_a_plant",
@@ -33,7 +36,7 @@ async def analyze_crop(
             }
 
         confidence = analysis.get("confidence")
-        if isinstance(confidence, (int, float)) and confidence < MIN_CONFIDENCE:
+        if not isinstance(confidence, (int, float)) or confidence < MIN_CONFIDENCE:
             return {
                 "status": "uncertain",
                 "message": "We are not confident about this diagnosis. Please retake the photo in good light, close to a single affected leaf.",
