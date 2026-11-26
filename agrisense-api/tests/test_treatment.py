@@ -65,6 +65,9 @@ def test_generate_wraps_provider_error_without_leaking(monkeypatch):
 
     class Boom:
         def __init__(self, *_): pass
+        def count_tokens(self, *_, **__):
+            class T: total_tokens = 100
+            return T()
         def generate_content(self, *_, **__): raise RuntimeError(SECRET)
 
     monkeypatch.setattr(treatment.genai, "GenerativeModel", Boom)
@@ -79,6 +82,9 @@ def test_model_name_comes_from_settings(monkeypatch):
 
     class M:
         def __init__(self, name): seen.append(name)
+        def count_tokens(self, *_, **__):
+            class T: total_tokens = 100
+            return T()
         def generate_content(self, *_, **__):
             class R: text = json.dumps(PLAN)
             return R()
