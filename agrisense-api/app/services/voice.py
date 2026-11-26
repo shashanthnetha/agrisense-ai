@@ -28,7 +28,7 @@ async def generate_voice(analysis: dict, treatment: dict, language: str = "Engli
 
         # Translate if not English
         if language != "English":
-            model = genai.GenerativeModel("gemini-2.5-flash-lite")
+            model = genai.GenerativeModel(settings.GEMINI_MODEL)
             response = model.generate_content(
                 f"Translate this agricultural report to {LANGUAGE_NAMES[language]}. "
                 f"Keep it natural and clear for farmers. Only return the translated text, nothing else:\n\n{script}"

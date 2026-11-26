@@ -1,4 +1,5 @@
 export interface Analysis {
+  is_plant?: boolean;
   disease_detected: boolean;
   disease_name: string;
   crop_type: string;
@@ -27,9 +28,11 @@ export interface Treatment {
 }
 
 export interface ScanResponse {
-  status: string;
+  status: 'healthy' | 'disease_detected' | 'not_a_plant' | 'uncertain';
+  message?: string;
   analysis: Analysis;
   treatment: Treatment | null;
+  treatment_message?: string;
   voice_data: string | null; // base64 string
 }
 

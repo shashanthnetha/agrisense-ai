@@ -20,6 +20,8 @@ async def generate_voice_report(request: VoiceRequest):
             raise HTTPException(status_code=500, detail="Voice generation failed")
         voice_base64 = base64.b64encode(voice_bytes).decode('utf-8')
         return {"voice_data": voice_base64}
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Voice endpoint error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Voice generation failed")

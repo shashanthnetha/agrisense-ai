@@ -5,11 +5,12 @@ import { ImageUploader } from '@/components/scan/ImageUploader';
 import { AnalysisResults } from '@/components/scan/AnalysisResults';
 import { TreatmentPlan } from '@/components/scan/TreatmentPlan';
 import { VoicePlayer } from '@/components/scan/VoicePlayer';
+import { Stepper } from '@/components/scan/Stepper';
 import { analyzeCrop } from '@/lib/api';
 import { ScanResponse } from '@/lib/types';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sprout, History, ArrowLeft, RefreshCcw } from 'lucide-react';
+import { Sprout, History, RefreshCcw, ScanLine } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
@@ -17,16 +18,39 @@ export default function ScanPage() {
   const [result, setResult] = useState<ScanResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [language, setLanguage] = useState("English");
+  const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+  const [lastFile, setLastFile] = useState<File | null>(null);
 
   const handleUpload = async (file: File) => {
     setIsLoading(true);
+    setError(null);
+    setNotice(null);
+    setLastFile(file);
     try {
       const data = await analyzeCrop(file, language);
+      if (
+        !data ||
+        !["healthy", "disease_detected", "not_a_plant", "uncertain"].includes(data.status)
+      ) {
+        throw new Error("Unexpected response from server");
+      }
+      if (data.status === "not_a_plant" || data.status === "uncertain") {
+        setNotice(
+          data.message ||
+            "We could not give a reliable result for this photo. Please try a clearer photo."
+        );
+        return;
+      }
       setResult(data);
       toast.success("Analysis complete!");
-    } catch (error: any) {
-      console.error(error);
-      toast.error(error.response?.data?.detail || "Failed to analyze image. Please try again.");
+    } catch (err: unknown) {
+      console.error(err);
+      const detail = (err as { response?: { data?: { detail?: unknown } } })?.response?.data?.detail;
+      setError(
+        (typeof detail === 'string' && detail) ||
+          "We could not analyze this image. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -34,88 +58,123 @@ export default function ScanPage() {
 
   const reset = () => {
     setResult(null);
+    setError(null);
+    setNotice(null);
   };
 
+  const step: 0 | 1 | 2 = result ? 2 : isLoading ? 1 : 0;
+
   return (
-    <div className="min-h-screen bg-slate-50 pb-20">
-      {/* Header */}
-      <header className="bg-white border-b sticky top-0 z-10 px-4 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
-          <Sprout className="h-6 w-6 text-primary" />
-          <span className="font-bold text-lg hidden sm:block">AgriSense AI</span>
+    <div className="min-h-screen bg-slate-50 pb-28">
+      <header className="sticky top-0 z-10 flex h-16 items-center justify-between border-b bg-white px-4">
+        <Link href="/" className="flex items-center gap-2" aria-label="AgriSense AI home">
+          <Sprout className="h-6 w-6 text-primary" aria-hidden />
+          <span className="hidden text-lg font-bold sm:block">AgriSense AI</span>
         </Link>
-        <div className="flex items-center gap-2">
-          <Link href="/history">
-            <Button variant="ghost" size="sm" className="gap-2">
-              <History className="h-4 w-4" /> History
-            </Button>
-          </Link>
-        </div>
+        <Link href="/history">
+          <Button variant="ghost" size="sm" className="h-10 gap-2">
+            <History className="h-4 w-4" aria-hidden /> History
+          </Button>
+        </Link>
       </header>
 
-      <main className="container max-w-2xl mx-auto px-4 py-8">
+      <main className="container mx-auto max-w-2xl space-y-6 px-4 py-6 sm:py-8">
+        <Stepper current={step} />
+
         <AnimatePresence mode="wait">
           {!result ? (
             <motion.div
               key="uploader"
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="space-y-8"
+              exit={{ opacity: 0, y: -12 }}
+              className="space-y-6"
             >
-              <div className="text-center space-y-2">
-                <h1 className="text-3xl font-black text-slate-900">Scan Your Crop</h1>
-                <p className="text-slate-500">Upload a clear photo of the infected area</p>
+              <div className="space-y-1 text-center">
+                <h1 className="text-2xl font-extrabold text-slate-900 sm:text-3xl">Scan your crop</h1>
+                <p className="text-sm text-slate-500">Get an AI-assisted check of a leaf from one photo.</p>
               </div>
 
               <ImageUploader onUpload={handleUpload} isLoading={isLoading} />
-              
-              <div className="bg-white p-6 rounded-2xl border border-slate-100 space-y-4">
-                <h3 className="font-bold text-slate-800 flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-primary" />
-                  Quick Tips for Better Results
-                </h3>
-                <ul className="grid grid-cols-1 gap-3 text-sm text-slate-600">
-                  <li className="flex gap-2">✅ Ensure good lighting (daylight is best)</li>
-                  <li className="flex gap-2">✅ Focus on a single leaf with symptoms</li>
-                  <li className="flex gap-2">✅ Hold the camera 10-15cm away</li>
-                  <li className="flex gap-2">✅ Avoid blurry or very dark photos</li>
+
+              {notice && (
+                <div role="status" className="space-y-1 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+                  <p className="font-semibold">No reliable result</p>
+                  <p>{notice}</p>
+                </div>
+              )}
+
+              {error && (
+                <div role="alert" className="space-y-3 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+                  <p className="font-semibold">Analysis failed</p>
+                  <p>{error}</p>
+                  {lastFile && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={isLoading}
+                      onClick={() => handleUpload(lastFile)}
+                      className="h-10 gap-2 border-red-300 text-red-800 hover:bg-red-100"
+                    >
+                      <RefreshCcw className="h-3 w-3" aria-hidden /> Try again
+                    </Button>
+                  )}
+                </div>
+              )}
+
+              <div className="rounded-2xl border border-slate-200 bg-white p-5">
+                <h2 className="mb-3 text-sm font-bold text-slate-800">For a clearer result</h2>
+                <ul className="space-y-2 text-sm text-slate-600">
+                  <li>Use daylight and avoid shadows.</li>
+                  <li>Frame one leaf that shows the symptoms.</li>
+                  <li>Hold the camera 10 to 15 cm away and keep it steady.</li>
+                  <li>Skip blurry or very dark photos.</li>
                 </ul>
               </div>
             </motion.div>
           ) : (
             <motion.div
               key="results"
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              className="space-y-8"
+              className="space-y-6"
             >
-              <div className="flex items-center justify-between">
-                <Button variant="ghost" onClick={reset} className="gap-2 -ml-2">
-                  <ArrowLeft className="h-4 w-4" /> New Scan
-                </Button>
-                <Button variant="outline" size="sm" onClick={reset} className="gap-2 rounded-full border-primary text-primary hover:bg-primary/5">
-                  <RefreshCcw className="h-3 w-3" /> Rescan
-                </Button>
-              </div>
-
-              <VoicePlayer 
-                base64Audio={result.voice_data} 
-                analysis={result.analysis} 
-                treatment={result.treatment}
-                onLanguageChange={setLanguage} 
-                currentLanguage={language} 
-              />
-
               <AnalysisResults analysis={result.analysis} />
 
-              {result.treatment && (
-                <TreatmentPlan treatment={result.treatment} />
+              {result.status === 'disease_detected' && result.treatment && (
+                <VoicePlayer
+                  base64Audio={result.voice_data}
+                  analysis={result.analysis}
+                  treatment={result.treatment}
+                  onLanguageChange={setLanguage}
+                  currentLanguage={language}
+                />
+              )}
+
+              {result.treatment && <TreatmentPlan treatment={result.treatment} />}
+
+              {result.status === 'disease_detected' && !result.treatment && (
+                <div role="alert" className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+                  <p className="font-bold">Treatment plan unavailable</p>
+                  <p className="mt-1">
+                    {result.treatment_message ?? 'Treatment advice is unavailable right now. Please scan again.'}
+                  </p>
+                </div>
               )}
             </motion.div>
           )}
         </AnimatePresence>
       </main>
+
+      {result && (
+        <div className="fixed inset-x-0 bottom-0 z-10 border-t bg-white/95 px-4 py-3 backdrop-blur">
+          <div className="mx-auto flex max-w-2xl gap-3">
+            <Button onClick={reset} className="h-12 flex-1 gap-2 rounded-xl">
+              <ScanLine className="h-5 w-5" aria-hidden /> Scan another leaf
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

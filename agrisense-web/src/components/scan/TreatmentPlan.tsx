@@ -22,7 +22,7 @@ export function TreatmentPlan({ treatment }: TreatmentPlanProps) {
   const [activeTab, setActiveTab] = useState<'organic' | 'chemical'>('organic');
 
   return (
-    <div className="space-y-5 w-full">
+    <div className="space-y-5 w-full" aria-label="Treatment plan">
 
       {/* Immediate Action */}
       <Card className="w-full bg-green-50 border-green-200">
@@ -37,8 +37,10 @@ export function TreatmentPlan({ treatment }: TreatmentPlanProps) {
       </Card>
 
       {/* Tab Toggle */}
-      <div className="w-full bg-slate-100 p-1 rounded-2xl flex">
+      <div role="tablist" aria-label="Treatment type" className="w-full bg-slate-100 p-1 rounded-2xl flex">
         <button
+          role="tab"
+          aria-selected={activeTab === 'organic'}
           onClick={() => setActiveTab('organic')}
           className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold transition-all ${
             activeTab === 'organic'
@@ -49,6 +51,8 @@ export function TreatmentPlan({ treatment }: TreatmentPlanProps) {
           <Leaf className="h-4 w-4" /> Organic
         </button>
         <button
+          role="tab"
+          aria-selected={activeTab === 'chemical'}
           onClick={() => setActiveTab('chemical')}
           className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold transition-all ${
             activeTab === 'chemical'
@@ -121,7 +125,7 @@ export function TreatmentPlan({ treatment }: TreatmentPlanProps) {
             <div className="bg-amber-50 p-4 rounded-xl border border-amber-100 flex gap-3 items-start">
               <AlertCircle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
               <p className="text-xs text-amber-800 leading-normal">
-                Always wear protective gear. Follow local agricultural safety guidelines.
+                Always wear protective gear and follow the product label and local agricultural safety guidelines. Confirm the product and dose with a local agriculture officer.
               </p>
             </div>
           </CardContent>

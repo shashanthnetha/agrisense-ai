@@ -1,14 +1,14 @@
-# 🌾 AgriSense AI — Crop Disease Detection in 10 Seconds
+# 🌾 AgriSense AI — Crop Disease Detection from a Photo
 
 <div align="center">
 
 ![AgriSense AI Banner](https://img.shields.io/badge/AgriSense-AI-green?style=for-the-badge&logo=leaf&logoColor=white)
 ![Next.js](https://img.shields.io/badge/Next.js_14-black?style=for-the-badge&logo=next.js)
 ![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)
-![Gemini](https://img.shields.io/badge/Gemini_2.5-4285F4?style=for-the-badge&logo=google&logoColor=white)
+![Gemini](https://img.shields.io/badge/Gemini-4285F4?style=for-the-badge&logo=google&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 
-**AI-powered agricultural expert in your pocket. Detect crop diseases, get treatment plans, and hear advice in your language — in 10 seconds.**
+**AI-powered agricultural expert in your pocket. Detect crop diseases, get treatment plans, and hear advice in your language.**
 
 [Demo](#demo) • [Features](#features) • [Tech Stack](#tech-stack) • [Getting Started](#getting-started) • [Architecture](#architecture)
 
@@ -32,7 +32,7 @@ India loses **₹90,000 crore every year** to crop diseases. When a farmer notic
 
 AgriSense AI gives every farmer an **AI agricultural expert in their pocket**.
 
-Upload a photo of a diseased leaf → get instant diagnosis, treatment plan, and voice explanation in their own language — in **under 10 seconds**.
+Upload a photo of a diseased leaf → get an AI-assisted diagnosis, treatment plan, and voice explanation in their own language. Results are estimates; response time has not been benchmarked.
 
 ---
 
@@ -50,13 +50,12 @@ Upload a photo of a diseased leaf → get instant diagnosis, treatment plan, and
 
 ## ✨ Features
 
-- 🔍 **Instant Disease Detection** — Gemini 2.5 Vision analyzes any crop disease
+- 🔍 **AI Disease Detection** — Gemini vision analyzes a leaf photo (model set by `GEMINI_MODEL`)
 - 📋 **Complete Treatment Plans** — Organic AND chemical options with dosage
 - 🔊 **Multilingual Voice Reports** — English, Hindi, Telugu, Tamil via ElevenLabs
-- 🧠 **RAG-Powered Knowledge** — Pinecone vector database with 50+ diseases
-- 📱 **Mobile-First Design** — Works perfectly on any smartphone
-- ⚡ **10 Second Response** — Full diagnosis in under 10 seconds
-- 🌐 **Production Ready** — Docker, PostgreSQL, Redis, proper API architecture
+- 🧠 **RAG-Powered Knowledge** — Pinecone vector database seeded with 50 diseases
+- 📱 **Mobile-First Design** — Responsive layout checked in desktop and 390px mobile Chrome (not yet on real phones)
+- 🌐 **Docker setup** — Dockerfile and docker-compose for the API, PostgreSQL and Redis
 
 ---
 
@@ -97,7 +96,7 @@ Frontend displays results + plays voice
 | Technology | Purpose |
 |-----------|---------|
 | FastAPI (Python) | API server and pipeline orchestration |
-| Gemini 2.5 Flash Lite | Vision AI for disease detection + treatment |
+| Gemini (default `gemini-3.5-flash-lite`) | Vision AI for disease detection + treatment |
 | Pinecone | Vector database for semantic disease search |
 | ElevenLabs | High-quality multilingual voice synthesis |
 | PostgreSQL | Persistent scan history storage |
@@ -263,7 +262,7 @@ agrisense-ai/
 
 - 🇮🇳 **140 million** Indian farmers who can benefit
 - 💰 **₹90,000 crore** annual crop loss that can be reduced
-- ⏱️ **3 days → 10 seconds** diagnosis time improvement
+- ⏱️ Faster first-pass diagnosis (not yet measured)
 - 📱 Works on any smartphone with a camera
 
 ---

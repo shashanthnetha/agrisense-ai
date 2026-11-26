@@ -17,6 +17,8 @@ class Settings(BaseSettings):
     
     # AI Keys
     GEMINI_API_KEY: str
+    # Model used for image analysis, treatment plans and translation.
+    GEMINI_MODEL: str = "gemini-3.5-flash-lite"
     PINECONE_API_KEY: str
     PINECONE_ENVIRONMENT: str
     PINECONE_INDEX_NAME: str
