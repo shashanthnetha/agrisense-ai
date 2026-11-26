@@ -9,16 +9,13 @@ for key in [
 ]:
     os.environ.setdefault(key, "test")
 
-# Replace the heavy services (Gemini treatment, ElevenLabs) with stubs
-# so the scan route can be tested without those packages or any network access.
-async def _treatment(analysis, ctx):
-    return {"immediate_action": "x"}
-
+# Replace the ElevenLabs voice service with a stub so the scan route can be tested
+# without that package or any network access. The real treatment module is imported
+# (google-generativeai is in requirements-dev); tests monkeypatch its model calls.
 async def _voice(analysis, treatment, language):
     return b"audio"
 
 for name, attr, fn in [
-    ("app.services.treatment", "generate_treatment", _treatment),
     ("app.services.voice", "generate_voice", _voice),
 ]:
     if name not in sys.modules:
