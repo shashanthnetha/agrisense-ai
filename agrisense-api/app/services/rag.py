@@ -1,39 +1,113 @@
-import json
-from pinecone import Pinecone
-from sentence_transformers import SentenceTransformer
-from app.core.config import settings
+import asyncio
 import logging
+import os
+from typing import List, Optional
 
 logger = logging.getLogger(__name__)
 
-pc = Pinecone(api_key=settings.PINECONE_API_KEY)
-index = pc.Index(settings.PINECONE_INDEX_NAME)
+TOP_K = 3
 
-# Load embedder
-embedder = SentenceTransformer('all-MiniLM-L6-v2')
+# Optional minimum similarity score for a retrieved match. Off by default.
+#
+# It is only applied when the Pinecone index metric is cosine or dotproduct
+# (higher = more similar). With the unit-length all-MiniLM-L6-v2 vectors used here
+# the two give the same scores. For a euclidean index the score is a distance and
+# a minimum would mean the opposite, so it is ignored. See
+# scripts/eval_retrieval.py for the score distributions this default is based on.
+SIMILARITY_METRICS = {"cosine", "dotproduct"}
+
+_embedder = None
+_index = None
+_metric: Optional[str] = None
+
+
+def _min_score() -> Optional[float]:
+    raw = os.getenv("RAG_MIN_SCORE")
+    if not raw:
+        return None
+    try:
+        return float(raw)
+    except ValueError:
+        logger.warning("Ignoring invalid RAG_MIN_SCORE")
+        return None
+
+
+def _load():
+    """Create the embedder and Pinecone index on first use (not at import time)."""
+    global _embedder, _index, _metric
+    if _embedder is not None and _index is not None:
+        return
+    from pinecone import Pinecone
+    from sentence_transformers import SentenceTransformer
+    from app.core.config import settings
+
+    pc = Pinecone(api_key=settings.PINECONE_API_KEY)
+    index = pc.Index(settings.PINECONE_INDEX_NAME)
+    try:
+        _metric = str(pc.describe_index(settings.PINECONE_INDEX_NAME).metric).lower()
+    except Exception as e:
+        logger.warning("Could not read Pinecone index metric: %s", type(e).__name__)
+        _metric = None
+    _embedder = SentenceTransformer("all-MiniLM-L6-v2")
+    _index = index
+
+
+def _clean_crop(crop: Optional[str]) -> Optional[str]:
+    crop = (crop or "").strip()
+    if not crop or crop.lower() == "unknown":
+        return None
+    return crop.title()
+
+
+def select_matches(matches: list, min_score: Optional[float], metric: Optional[str]) -> list:
+    """Drop matches below min_score, only when the metric is a similarity."""
+    if min_score is None or metric not in SIMILARITY_METRICS:
+        return list(matches)
+    return [m for m in matches if getattr(m, "score", None) is not None and m.score >= min_score]
+
+
+def build_context(matches: list) -> str:
+    context = ""
+    for match in matches:
+        metadata = match.metadata or {}
+        score = getattr(match, "score", None)
+        context += "\n--- Disease Info ---\n"
+        if score is not None:
+            context += f"Match score: {score:.2f}\n"
+        context += f"Name: {metadata.get('name')}\n"
+        context += f"Crop: {metadata.get('crop')}\n"
+        context += f"Symptoms: {metadata.get('symptoms')}\n"
+        context += f"Organic Treatment: {metadata.get('organic_treatment')}\n"
+        context += f"Chemical Treatment: {metadata.get('chemical_treatment')}\n"
+        context += f"Prevention: {metadata.get('prevention')}\n"
+    return context
+
+
+def _query_sync(disease: Optional[str], crop: Optional[str]) -> List:
+    _load()
+    query_text = f"Disease: {disease} in Crop: {crop}"
+    vector = _embedder.encode(query_text).tolist()
+
+    crop_name = _clean_crop(crop)
+    matches = []
+    if crop_name:
+        # Prefer entries for the same crop; fall back to all crops if there are none.
+        results = _index.query(
+            vector=vector, top_k=TOP_K, include_metadata=True,
+            filter={"crop": {"$eq": crop_name}},
+        )
+        matches = list(results.matches)
+    if not matches:
+        results = _index.query(vector=vector, top_k=TOP_K, include_metadata=True)
+        matches = list(results.matches)
+    return select_matches(matches, _min_score(), _metric)
+
 
 async def query_disease_knowledge(disease: str, crop: str):
     try:
-        query_text = f"Disease: {disease} in Crop: {crop}"
-        query_vector = embedder.encode(query_text).tolist()
-        
-        results = index.query(
-            vector=query_vector,
-            top_k=3,
-            include_metadata=True
-        )
-        
-        context = ""
-        for match in results.matches:
-            metadata = match.metadata
-            context += f"\n--- Disease Info ---\n"
-            context += f"Name: {metadata.get('name')}\n"
-            context += f"Crop: {metadata.get('crop')}\n"
-            context += f"Symptoms: {metadata.get('symptoms')}\n"
-            context += f"Organic Treatment: {metadata.get('organic_treatment')}\n"
-            context += f"Chemical Treatment: {metadata.get('chemical_treatment')}\n"
-            context += f"Prevention: {metadata.get('prevention')}\n"
-            
+        # The embedding model and the Pinecone call are blocking: keep them off the event loop.
+        matches = await asyncio.to_thread(_query_sync, disease, crop)
+        context = build_context(matches)
         return context if context else "No specific knowledge found in vector database."
     except Exception as e:
         logger.error(f"Error querying Pinecone: {e}")
