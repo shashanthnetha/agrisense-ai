@@ -57,6 +57,9 @@ def make_model(outputs):
 
     class Fake:
         def __init__(self, *a, **k): pass
+        def count_tokens(self, *_, **__):
+            class T: total_tokens = 100
+            return T()
         def generate_content(self, *a, **k):
             calls.append(k)
             item = outputs[min(len(calls) - 1, len(outputs) - 1)]
@@ -127,6 +130,9 @@ def test_hung_model_call_times_out_once_without_overlapping_retries(monkeypatch)
 
     class Hang:
         def __init__(self, *a, **k): pass
+        def count_tokens(self, *_, **__):
+            class T: total_tokens = 100
+            return T()
         def generate_content(self, *a, **k):
             calls.append(1)
             time.sleep(0.4)
