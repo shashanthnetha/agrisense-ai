@@ -84,6 +84,8 @@ def voice_allowed() -> bool:
 
 
 def reset_for_tests() -> None:
+    from app.services.guard import reset_budget_for_tests
+    reset_budget_for_tests()
     with _lock:
         _ip_hits.clear()
         _day.update(key=None, count=0)
