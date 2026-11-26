@@ -132,3 +132,9 @@ def test_aggregate_token_budget_blocks(monkeypatch):
     with pytest.raises(BudgetExceeded):
         check_input_tokens(M(), "x", 100, "t")
     reset_budget_for_tests()
+
+
+def test_recovery_timeline_never_shown():
+    from app.services.safety import sanitize_plan
+    out = sanitize_plan({"recovery_timeline": "7-10 days"})
+    assert "7-10" not in out["recovery_timeline"] and "unsourced" in out["recovery_timeline"]
