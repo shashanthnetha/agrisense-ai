@@ -12,8 +12,8 @@ app = FastAPI(
 # Set all CORS enabled origins
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, specify real domains
-    allow_credentials=True,
+    allow_origins=[o.strip() for o in settings.CORS_ORIGINS.split(",") if o.strip()],
+    allow_credentials=False,  # the app sends an access-key header, not cookies
     allow_methods=["*"],
     allow_headers=["*"],
 )
