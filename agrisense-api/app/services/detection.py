@@ -17,6 +17,8 @@ logger = logging.getLogger(__name__)
 MODEL_ATTEMPTS = 3
 MODEL_TIMEOUT_SECONDS = 30
 RETRY_BACKOFF_SECONDS = 0.5
+# Extra wall-clock allowance on top of the SDK timeout before we stop waiting.
+WAIT_GRACE_SECONDS = 5
 
 
 class AnalysisError(Exception):
@@ -81,11 +83,13 @@ def preprocess_image(image_bytes: bytes):
 class AnalysisResult(BaseModel):
     """Schema for the model's JSON output."""
 
-    is_plant: StrictBool = True
+    # Required, no defaults: a missing is_plant or confidence must not become
+    # an assumed "plant" or an invented certainty.
+    is_plant: StrictBool
     disease_detected: StrictBool
     disease_name: str = ""
     crop_type: str = "Unknown"
-    confidence: float = Field(default=0, ge=0, le=100)
+    confidence: float = Field(ge=0, le=100)
     affected_area_percent: float = Field(default=0, ge=0, le=100)
     visible_symptoms: List[str] = Field(default_factory=list)
     urgency: Literal["Low", "Medium", "High", "Critical"] = "Low"
@@ -140,9 +144,14 @@ async def analyze_image(image_bytes: bytes):
         try:
             text = await asyncio.wait_for(
                 asyncio.to_thread(_call_model, processed_bytes),
-                timeout=MODEL_TIMEOUT_SECONDS + 5,
+                timeout=MODEL_TIMEOUT_SECONDS + WAIT_GRACE_SECONDS,
             )
             return parse_analysis(text)
+        except asyncio.TimeoutError as e:
+            # The worker thread cannot be cancelled. Do not start another call
+            # while it may still be running: stop here instead of piling up threads.
+            logger.error("Detection call exceeded the wall-clock limit; not retrying")
+            raise AnalysisError("Image analysis timed out") from e
         except Exception as e:
             last_error = e
             logger.warning(
