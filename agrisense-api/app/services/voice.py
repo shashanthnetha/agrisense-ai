@@ -1,9 +1,10 @@
 import logging
+import re
 import google.generativeai as genai
 from elevenlabs.client import ElevenLabs
 from app.core.config import settings
 
-from app.services.safety import clean_text
+from app.services.safety import clean_text, has_chemical_advice
 from app.services.guard import check_input_tokens, log_usage
 
 logger = logging.getLogger(__name__)
@@ -18,19 +19,32 @@ LANGUAGE_NAMES = {
     "Telugu": "Telugu"
 }
 
+_SAFE_LABEL = re.compile(r"^[A-Za-z][A-Za-z '\-]{0,39}$")
+
+
+def _label(value, fallback: str) -> str:
+    v = value.strip() if isinstance(value, str) else ""
+    if _SAFE_LABEL.match(v) and not has_chemical_advice(v):
+        return v
+    return fallback
+
+
+def _urgency(value) -> str:
+    return value if value in ("Low", "Medium", "High") else "not stated"
+
+
 async def generate_voice(analysis: dict, treatment: dict, language: str = "English"):
     try:
-        script = f"""
-        AgriSense AI Crop Health Report.
-        Crop: {analysis.get('crop_type')}.
-        Disease: {analysis.get('disease_name')}.
-        Urgency: {analysis.get('urgency')}.
-        Immediate Action: {treatment.get('immediate_action')}.
-        Recovery Timeline: {treatment.get('recovery_timeline')}.
-        """
-
-        # Never speak chemical advice, whatever the caller or model supplied
-        script, _ = clean_text(script, "Please ask a local agriculture officer for advice.")
+        # The spoken report is composed here from bounded fields only. Free text from the
+        # caller or the model (treatment steps, timelines) is never read aloud.
+        script = (
+            "AgriSense AI crop health report. "
+            f"Crop: {_label(analysis.get('crop_type'), 'not identified')}. "
+            f"Possible issue: {_label(analysis.get('disease_name'), 'not identified')}. "
+            f"Urgency: {_urgency(analysis.get('urgency'))}. "
+            "This is an automated estimate from one photo. "
+            "Please confirm with a local agriculture officer before taking any action."
+        )
 
         # Translate if not English
         if language != "English":
