@@ -37,6 +37,10 @@ class Settings(BaseSettings):
     MAX_OUTPUT_TOKENS_TREATMENT: int = 2000
     MAX_OUTPUT_TOKENS_TRANSLATION: int = 800
     MAX_VOICE_CHARS: int = 800
+    # Input caps, checked with the free count_tokens call before each paid generate call
+    MAX_INPUT_TOKENS_DETECTION: int = 2500
+    MAX_INPUT_TOKENS_TREATMENT: int = 4000
+    MAX_INPUT_TOKENS_TRANSLATION: int = 1500
 
     # AWS
     AWS_ACCESS_KEY_ID: Optional[str] = None
