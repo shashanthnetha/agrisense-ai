@@ -53,7 +53,7 @@ export function AnalysisResults({ analysis }: AnalysisResultsProps) {
           )}
         </CardTitle>
         <CardDescription className="text-base">
-          Confidence: {analysis.confidence}% Accuracy
+          Model confidence: {analysis.confidence}% (self-reported estimate, not verified accuracy)
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6 pt-4">
