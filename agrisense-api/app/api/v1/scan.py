@@ -2,7 +2,7 @@ from fastapi import APIRouter, UploadFile, File, HTTPException, Form
 from typing import Optional
 import base64
 import logging
-from app.services.detection import analyze_image
+from app.services.detection import analyze_image, AnalysisError
 from app.services.rag import query_disease_knowledge
 from app.services.treatment import generate_treatment
 from app.services.voice import generate_voice
@@ -18,8 +18,11 @@ async def analyze_crop(
     try:
         contents = await image.read()
         analysis = await analyze_image(contents)
-        
-        if not analysis.get("disease_detected"):
+
+        # Only an explicit disease_detected == False is a healthy result.
+        if not isinstance(analysis.get("disease_detected"), bool):
+            raise AnalysisError("Analysis is missing disease_detected")
+        if analysis.get("disease_detected") is False:
             return {
                 "status": "healthy",
                 "analysis": analysis,
@@ -46,6 +49,14 @@ async def analyze_crop(
             "voice_data": voice_base64
         }
         
-    except Exception as e:
-        logger.error(f"Scan endpoint error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+    except AnalysisError:
+        raise HTTPException(
+            status_code=502,
+            detail="We could not analyze this image. Please try again with a clear, well-lit photo of a single leaf.",
+        )
+    except Exception:
+        logger.exception("Scan endpoint error")
+        raise HTTPException(
+            status_code=500,
+            detail="Something went wrong while processing your scan. Please try again.",
+        )
