@@ -41,6 +41,9 @@ class Settings(BaseSettings):
     MAX_INPUT_TOKENS_DETECTION: int = 2500
     MAX_INPUT_TOKENS_TREATMENT: int = 4000
     MAX_INPUT_TOKENS_TRANSLATION: int = 1500
+    # Aggregate Gemini allowance for this process (in memory: resets on restart, so a soft limit)
+    TOTAL_GEMINI_CALLS_BUDGET: int = 60
+    TOTAL_INPUT_TOKENS_BUDGET: int = 150000
 
     # AWS
     AWS_ACCESS_KEY_ID: Optional[str] = None
