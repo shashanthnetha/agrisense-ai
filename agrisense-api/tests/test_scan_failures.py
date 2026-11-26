@@ -195,7 +195,9 @@ def test_explicit_healthy_result(monkeypatch):
 
 def test_disease_path_still_works(monkeypatch):
     async def ok(_): return GOOD
+    async def plan(*a, **k): return {"immediate_action": "x"}
     monkeypatch.setattr(scan, "analyze_image", ok)
+    monkeypatch.setattr(scan, "generate_treatment", plan)
     r = post(make_client())
     body = r.json()
     assert r.status_code == 200 and body["status"] == "disease_detected"
