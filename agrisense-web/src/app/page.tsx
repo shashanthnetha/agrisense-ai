@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Camera, ShieldCheck, Zap, Globe, Leaf, History, UserCheck, Sprout } from "lucide-react";
+import { Camera, ShieldCheck, Zap, Globe, Leaf, UserCheck, Sprout } from "lucide-react";
 
 export default function LandingPage() {
   return (
@@ -11,17 +11,14 @@ export default function LandingPage() {
       <header className="px-4 lg:px-6 h-16 flex items-center border-b bg-white sticky top-0 z-50">
         <Link className="flex items-center justify-center gap-2" href="#">
           <Sprout className="h-6 w-6 text-primary" />
-          <span className="text-xl font-bold text-primary">AgriSense AI</span>
+          <span className="text-xl font-bold text-primary whitespace-nowrap">AgriSense AI</span>
         </Link>
         <nav className="ml-auto flex gap-4 sm:gap-6">
-          <Link className="text-sm font-medium hover:underline underline-offset-4" href="#features">
+          <Link className="hidden sm:inline text-sm font-medium hover:underline underline-offset-4" href="#features">
             Features
           </Link>
-          <Link className="text-sm font-medium hover:underline underline-offset-4" href="#how-it-works">
+          <Link className="hidden sm:inline text-sm whitespace-nowrap font-medium hover:underline underline-offset-4" href="#how-it-works">
             How it Works
-          </Link>
-          <Link href="/login">
-            <Button variant="ghost" size="sm">Login</Button>
           </Link>
           <Link href="/scan">
             <Button size="sm">Get Started</Button>
@@ -36,10 +33,10 @@ export default function LandingPage() {
             <div className="flex flex-col items-center space-y-4 text-center">
               <div className="space-y-2">
                 <Badge className="px-3 py-1 mb-4" variant="secondary">
-                  Trusted by 1M+ Farmers
+                  AI-assisted crop check
                 </Badge>
                 <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl/none text-slate-900">
-                  Detect Crop Diseases in <span className="text-primary text-green-700">10 Seconds</span>
+                  Check Crop Diseases from a <span className="text-primary text-green-700">Single Photo</span>
                 </h1>
                 <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl dark:text-gray-400 mt-4">
                   AI-powered agricultural expert in your pocket. Identify diseases, get organic treatments, and save your harvest.
@@ -60,11 +57,11 @@ export default function LandingPage() {
               <div className="pt-8 flex items-center justify-center gap-4 text-sm text-gray-500">
                 <div className="flex items-center gap-1">
                   <ShieldCheck className="h-4 w-4 text-primary" />
-                  98% Accuracy
+                  Confidence shown on every result
                 </div>
                 <div className="flex items-center gap-1">
                   <Globe className="h-4 w-4 text-primary" />
-                  12+ Languages
+                  Voice in 4 languages
                 </div>
               </div>
             </div>
@@ -80,8 +77,8 @@ export default function LandingPage() {
                   <div className="p-3 bg-green-100 rounded-2xl mb-2">
                     <Zap className="h-8 w-8 text-primary" />
                   </div>
-                  <CardTitle>Instant Detection</CardTitle>
-                  <CardDescription>Upload a photo and get results in seconds using Gemini 2.0 AI.</CardDescription>
+                  <CardTitle>Photo-based Detection</CardTitle>
+                  <CardDescription>Upload a photo and get an AI-assisted result using Google Gemini.</CardDescription>
                 </CardHeader>
               </Card>
               <Card className="border-none shadow-none bg-transparent">
@@ -90,7 +87,7 @@ export default function LandingPage() {
                     <Leaf className="h-8 w-8 text-primary" />
                   </div>
                   <CardTitle>Organic Treatments</CardTitle>
-                  <CardDescription>Detailed organic and chemical recovery plans for 500+ diseases.</CardDescription>
+                  <CardDescription>Detailed organic and chemical recovery plans drawn from a 50-disease knowledge base.</CardDescription>
                 </CardHeader>
               </Card>
               <Card className="border-none shadow-none bg-transparent">
