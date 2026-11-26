@@ -116,3 +116,8 @@ def test_voice_failure_is_non_fatal(monkeypatch):
     monkeypatch.setattr(scan, "generate_voice", no_voice)
     body = post(client()).json()
     assert body["treatment"] and body["voice_data"] is None
+
+
+def test_default_model_is_gemini_3_5_flash_lite():
+    from app.core.config import Settings
+    assert Settings.model_fields["GEMINI_MODEL"].default == "gemini-3.5-flash-lite"
