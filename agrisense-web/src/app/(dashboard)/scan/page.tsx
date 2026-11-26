@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ImageUploader } from '@/components/scan/ImageUploader';
 import { AnalysisResults } from '@/components/scan/AnalysisResults';
 import { TreatmentPlan } from '@/components/scan/TreatmentPlan';
 import { VoicePlayer } from '@/components/scan/VoicePlayer';
 import { Stepper } from '@/components/scan/Stepper';
-import { analyzeCrop } from '@/lib/api';
+import { analyzeCrop, ACCESS_KEY_STORAGE } from '@/lib/api';
 import { ScanResponse } from '@/lib/types';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -21,6 +21,16 @@ export default function ScanPage() {
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [lastFile, setLastFile] = useState<File | null>(null);
+  const [accessKey, setAccessKey] = useState<string>('');
+
+  useEffect(() => {
+    setAccessKey(window.localStorage.getItem(ACCESS_KEY_STORAGE) || '');
+  }, []);
+
+  const saveAccessKey = (value: string) => {
+    setAccessKey(value);
+    window.localStorage.setItem(ACCESS_KEY_STORAGE, value.trim());
+  };
 
   const handleUpload = async (file: File) => {
     setIsLoading(true);
@@ -93,6 +103,20 @@ export default function ScanPage() {
               <div className="space-y-1 text-center">
                 <h1 className="text-2xl font-extrabold text-slate-900 sm:text-3xl">Scan your crop</h1>
                 <p className="text-sm text-slate-500">Get an AI-assisted check of a leaf from one photo.</p>
+              </div>
+
+              <div className="space-y-1">
+                <label htmlFor="access-key" className="text-xs font-medium text-slate-600">
+                  Access key (needed to scan during the demo)
+                </label>
+                <input
+                  id="access-key"
+                  type="password"
+                  autoComplete="off"
+                  value={accessKey}
+                  onChange={(e) => saveAccessKey(e.target.value)}
+                  className="h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm"
+                />
               </div>
 
               <ImageUploader onUpload={handleUpload} isLoading={isLoading} />
