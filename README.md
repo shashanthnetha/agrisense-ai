@@ -317,6 +317,11 @@ This project is licensed under the MIT License — see the [LICENSE](LICENSE) fi
 
 </div>
 
+## Safety limits of this demo
+
+- Chemical products and doses are not shown anywhere. The knowledge base has no source for them. The server drops the model's chemical section, filters every text field with a pattern list, and the voice report is composed on the server from the crop, the possible issue and the urgency only, with a fixed reminder to confirm with a local agriculture officer. The pattern filter lowers risk but does not prove that no unsafe product name can pass, and it only knows English terms.
+- Paid calls need the access key. Each Gemini call is preceded by a free token count and is refused over a per-request cap (`MAX_INPUT_TOKENS_*`) or an aggregate allowance (`TOTAL_GEMINI_CALLS_BUDGET`, `TOTAL_INPUT_TOKENS_BUDGET`). These counters live in memory and reset when the service restarts, so they are a soft limit, not a spending cap.
+
 ## Retrieval notes
 
 - The Pinecone index `agrisense-diseases` stores 384-d MiniLM (`all-MiniLM-L6-v2`) vectors of
