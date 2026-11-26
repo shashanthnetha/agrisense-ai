@@ -43,14 +43,79 @@ def test_parse_rejects_unusable_output(bad):
 
 # --- analyze_image --------------------------------------------------------
 
-def test_analyze_image_raises_when_model_call_fails(monkeypatch):
-    class Boom:
+def make_model(outputs):
+    """Fake GenerativeModel that returns/raises items from `outputs` in order."""
+    calls = []
+
+    class Fake:
         def __init__(self, *a, **k): pass
-        def generate_content(self, *a, **k): raise RuntimeError("quota secret-detail")
-    monkeypatch.setattr(detection.genai, "GenerativeModel", Boom)
+        def generate_content(self, *a, **k):
+            calls.append(k)
+            item = outputs[min(len(calls) - 1, len(outputs) - 1)]
+            if isinstance(item, Exception):
+                raise item
+            return type("R", (), {"text": item})()
+
+    return Fake, calls
+
+
+def test_analyze_image_raises_when_model_call_fails(monkeypatch):
+    monkeypatch.setattr(detection, "RETRY_BACKOFF_SECONDS", 0)
+    Fake, calls = make_model([RuntimeError("quota secret-detail")])
+    monkeypatch.setattr(detection.genai, "GenerativeModel", Fake)
     with pytest.raises(AnalysisError) as exc:
         asyncio.run(detection.analyze_image(b"not-an-image"))
     assert "secret-detail" not in str(exc.value)
+    assert len(calls) == detection.MODEL_ATTEMPTS
+
+
+def test_retries_then_succeeds(monkeypatch):
+    monkeypatch.setattr(detection, "RETRY_BACKOFF_SECONDS", 0)
+    Fake, calls = make_model([RuntimeError("temporary"), "not json", json.dumps(GOOD)])
+    monkeypatch.setattr(detection.genai, "GenerativeModel", Fake)
+    result = asyncio.run(detection.analyze_image(b"x"))
+    assert result["disease_name"] == "Leaf Blight"
+    assert len(calls) == 3
+
+
+def test_model_call_passes_timeout(monkeypatch):
+    Fake, calls = make_model([json.dumps(GOOD)])
+    monkeypatch.setattr(detection.genai, "GenerativeModel", Fake)
+    asyncio.run(detection.analyze_image(b"x"))
+    assert calls[0]["request_options"]["timeout"] == detection.MODEL_TIMEOUT_SECONDS
+
+
+# --- schema validation ----------------------------------------------------
+
+@pytest.mark.parametrize("patch", [
+    {"confidence": 150}, {"confidence": -1}, {"affected_area_percent": 101},
+    {"urgency": "Severe"}, {"visible_symptoms": "spots"},
+    {"disease_detected": True, "disease_name": ""}, {"is_plant": "no"},
+])
+def test_schema_rejects_bad_values(patch):
+    with pytest.raises(AnalysisError):
+        parse_analysis(json.dumps({**GOOD, **patch}))
+
+
+def test_schema_fills_defaults_for_healthy_result():
+    out = parse_analysis(json.dumps({"disease_detected": False}))
+    assert out["is_plant"] is True and out["crop_type"] == "Unknown" and out["visible_symptoms"] == []
+
+
+# --- uncertain / not a plant ---------------------------------------------
+
+def test_not_a_plant_result(monkeypatch):
+    async def ok(_): return {**GOOD, "is_plant": False, "disease_detected": False}
+    monkeypatch.setattr(scan, "analyze_image", ok)
+    body = post(make_client()).json()
+    assert body["status"] == "not_a_plant" and body["treatment"] is None and body["message"]
+
+
+def test_low_confidence_is_uncertain_and_skips_treatment(monkeypatch):
+    async def ok(_): return {**GOOD, "confidence": scan.MIN_CONFIDENCE - 1}
+    monkeypatch.setattr(scan, "analyze_image", ok)
+    body = post(make_client()).json()
+    assert body["status"] == "uncertain" and body["treatment"] is None and body["voice_data"] is None
 
 
 # --- /analyze route -------------------------------------------------------
