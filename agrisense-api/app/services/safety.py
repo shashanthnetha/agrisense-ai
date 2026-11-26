@@ -75,7 +75,8 @@ def sanitize_plan(plan: dict) -> dict:
     out["chemical_treatment"] = None
     out["chemical_notice"] = CHEMICAL_NOTICE
     out["immediate_action"], _ = clean_text(out.get("immediate_action", ""), SAFE_ACTION)
-    out["recovery_timeline"], _ = clean_text(out.get("recovery_timeline", ""), "Ask a local agriculture officer.")
+    # Recovery periods are model-made and unsourced: never show them as an expectation.
+    out["recovery_timeline"] = "Not shown (unsourced). Ask a local agriculture officer."
     out["warning_signs"], _ = clean_text(out.get("warning_signs", ""), "If the problem spreads or gets worse, ask a local agriculture officer.")
     out["prevention_tips"], _ = clean_list(out.get("prevention_tips", []))
     org = dict(out.get("organic_treatment") or {})
