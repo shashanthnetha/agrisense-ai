@@ -157,6 +157,12 @@ PINECONE_API_KEY=your_pinecone_api_key
 PINECONE_ENVIRONMENT=us-east-1
 PINECONE_INDEX_NAME=agrisense-diseases
 ELEVENLABS_API_KEY=your_elevenlabs_api_key
+
+# Paid endpoints (/scan/analyze, /voice/generate) are CLOSED unless this is set;
+# callers must send it in the X-Access-Key header (the scan page has a field for it).
+ACCESS_KEY=choose_a_long_random_value
+# Optional usage limits (in-memory, reset on restart; not billing-grade):
+# SCANS_PER_IP_PER_HOUR=5  DAILY_SCAN_CAP=100  MONTHLY_VOICE_CAP=15  MAX_UPLOAD_MB=8
 ```
 
 ### 4. Seed the Disease Database
@@ -310,3 +316,14 @@ This project is licensed under the MIT License — see the [LICENSE](LICENSE) fi
 *AgriSense AI — Because every farmer deserves a crop expert in their pocket.*
 
 </div>
+
+## Retrieval notes
+
+- The Pinecone index `agrisense-diseases` stores 384-d MiniLM (`all-MiniLM-L6-v2`) vectors of
+  `Disease: {name} Crop: {crop} Symptoms: {symptoms}`. The app embeds the query locally with the
+  same model (fastembed ONNX) and sends the vector.
+- The index also has a `llama-text-embed-v2` integration configured. Do not use Pinecone text
+  search on it: that is a different embedding space and returns wrong matches.
+- Only two stored vectors (`disease_0`, `disease_22`) were checked against a local embedding; the
+  other records are assumed to follow the same seed script.
+- `PINECONE_ENVIRONMENT`, `DATABASE_URL`, `REDIS_URL` and `SECRET_KEY` are not used at runtime yet.
