@@ -124,7 +124,7 @@ def parse_analysis(text: str) -> dict:
 
 
 def _call_model(processed_bytes: bytes) -> str:
-    model = genai.GenerativeModel("gemini-2.5-flash-lite")
+    model = genai.GenerativeModel(settings.GEMINI_MODEL)
     image_part = {"mime_type": "image/jpeg", "data": processed_bytes}
     response = model.generate_content(
         [VISION_PROMPT, image_part],
