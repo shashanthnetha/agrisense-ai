@@ -36,6 +36,8 @@ class Settings(BaseSettings):
     MAX_OUTPUT_TOKENS_DETECTION: int = 1200
     MAX_OUTPUT_TOKENS_TREATMENT: int = 2000
     MAX_OUTPUT_TOKENS_TRANSLATION: int = 800
+    # Comma-separated browser origins allowed to call the API. "*" is for local development only.
+    CORS_ORIGINS: str = "*"
     MAX_VOICE_CHARS: int = 800
     # Input caps, checked with the free count_tokens call before each paid generate call
     MAX_INPUT_TOKENS_DETECTION: int = 2500
