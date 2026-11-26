@@ -91,8 +91,8 @@ def build_context(matches: list) -> str:
         context += f"Name: {metadata.get('name')}\n"
         context += f"Crop: {metadata.get('crop')}\n"
         context += f"Symptoms: {metadata.get('symptoms')}\n"
+        # Chemical fields are deliberately left out: they have no source (see services/safety.py).
         context += f"Organic Treatment: {metadata.get('organic_treatment')}\n"
-        context += f"Chemical Treatment: {metadata.get('chemical_treatment')}\n"
         context += f"Prevention: {metadata.get('prevention')}\n"
     return context
 
