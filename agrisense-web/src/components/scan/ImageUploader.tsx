@@ -97,7 +97,7 @@ export function ImageUploader({ onUpload, isLoading }: ImageUploaderProps) {
             <ImagePlus className="mr-2 h-5 w-5" aria-hidden /> Choose from gallery
           </Button>
         </div>
-        <p className="mt-4 text-xs text-slate-400">JPG or PNG, up to 10 MB. You can also drop a file here.</p>
+        <p className="mt-4 text-xs text-slate-400">JPG or PNG, up to 8 MB. You can also drop a file here.</p>
       </div>
     );
   }

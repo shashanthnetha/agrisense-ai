@@ -1,3 +1,4 @@
 -r requirements.txt
 pytest>=7.0
 httpx>=0.25
+sentence-transformers>=2.7.0  # only for scripts/eval_retrieval.py

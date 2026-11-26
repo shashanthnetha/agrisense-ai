@@ -1,8 +1,9 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 import base64
 import logging
 from app.services.voice import generate_voice
+from app.core import limits
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -13,7 +14,10 @@ class VoiceRequest(BaseModel):
     language: str = "English"
 
 @router.post("/generate")
-async def generate_voice_report(request: VoiceRequest):
+async def generate_voice_report(request: VoiceRequest, http: Request):
+    limits.require_access(http)
+    if not limits.voice_allowed():
+        raise HTTPException(status_code=429, detail="The voice report limit has been reached for now. Please try again later.")
     try:
         voice_bytes = await generate_voice(request.analysis, request.treatment, request.language)
         if not voice_bytes:

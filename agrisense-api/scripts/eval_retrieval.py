@@ -9,6 +9,12 @@ real index metric is not recorded in this repo (the index is created by hand in
 the Pinecone dashboard), so these scores match a cosine or dotproduct index and
 do NOT match a euclidean one.
 
+PROVENANCE: the live agrisense-diseases index stores MiniLM vectors of exactly this
+text (checked for disease_0 and disease_22: cosine 1.0 against all-MiniLM-L6-v2). The
+index also has a llama-text-embed-v2 integration configured, but querying it by text
+searches a different embedding space and returns wrong matches. Always query with a
+MiniLM vector (rag.py does, through fastembed ONNX), never with Pinecone text search.
+
 Usage: python scripts/eval_retrieval.py
 """
 import json

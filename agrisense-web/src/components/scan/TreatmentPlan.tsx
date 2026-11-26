@@ -105,22 +105,13 @@ export function TreatmentPlan({ treatment }: TreatmentPlanProps) {
             <CardTitle className="flex items-center gap-2 text-lg">
               <FlaskConical className="text-blue-600 h-5 w-5" /> Chemical Treatment
             </CardTitle>
-            <CardDescription>Targeted scientific solutions</CardDescription>
+            <CardDescription>Not shown in this demo</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 flex items-center gap-4">
-              <div className="p-3 bg-blue-100 rounded-full shrink-0">
-                <FlaskConical className="text-blue-600 h-5 w-5" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-xs font-bold uppercase text-blue-500">Recommended Product</p>
-                <p className="text-base font-bold text-slate-900">{treatment.chemical_treatment.product}</p>
-                <p className="text-xs text-blue-500">Active: {treatment.chemical_treatment.active_ingredient}</p>
-              </div>
-            </div>
             <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
-              <h4 className="text-xs font-bold uppercase text-slate-500 mb-2">Dosage Instructions</h4>
-              <p className="text-slate-800 text-sm leading-relaxed">{treatment.chemical_treatment.dosage}</p>
+              <p className="text-slate-800 text-sm leading-relaxed" data-testid="chemical-notice">
+                {treatment.chemical_notice ?? 'Chemical advice is not shown in this demo. Ask a local agriculture officer.'}
+              </p>
             </div>
             <div className="bg-amber-50 p-4 rounded-xl border border-amber-100 flex gap-3 items-start">
               <AlertCircle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />

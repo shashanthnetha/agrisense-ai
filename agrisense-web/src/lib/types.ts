@@ -17,11 +17,8 @@ export interface Treatment {
     materials: string[];
     dosage: string;
   };
-  chemical_treatment: {
-    product: string;
-    active_ingredient: string;
-    dosage: string;
-  };
+  chemical_treatment: null;
+  chemical_notice?: string;
   prevention_tips: string[];
   recovery_timeline: string;
   warning_signs: string;

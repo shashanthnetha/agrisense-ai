@@ -43,7 +43,7 @@ Upload a photo of a diseased leaf → get an AI-assisted diagnosis, treatment pl
 | 📸 Upload leaf photo | Farmer takes/uploads image |
 | 🧠 AI analyzes | Gemini Vision detects disease |
 | 📊 Results shown | Disease name, confidence, symptoms |
-| 💊 Treatment plan | Organic + chemical options |
+| 💊 Treatment plan | Organic and prevention guidance (chemical advice withheld, see below) |
 | 🔊 Voice report | ElevenLabs speaks in Telugu/Hindi |
 
 ---
@@ -51,7 +51,7 @@ Upload a photo of a diseased leaf → get an AI-assisted diagnosis, treatment pl
 ## ✨ Features
 
 - 🔍 **AI Disease Detection** — Gemini vision analyzes a leaf photo (model set by `GEMINI_MODEL`)
-- 📋 **Complete Treatment Plans** — Organic AND chemical options with dosage
+- 📋 **Complete Treatment Plans** — Organic and prevention guidance. Chemical products and doses are not shown: the knowledge base has no source for them
 - 🔊 **Multilingual Voice Reports** — English, Hindi, Telugu, Tamil via ElevenLabs
 - 🧠 **RAG-Powered Knowledge** — Pinecone vector database seeded with 50 diseases
 - 📱 **Mobile-First Design** — Responsive layout checked in desktop and 390px mobile Chrome (not yet on real phones)
@@ -157,6 +157,12 @@ PINECONE_API_KEY=your_pinecone_api_key
 PINECONE_ENVIRONMENT=us-east-1
 PINECONE_INDEX_NAME=agrisense-diseases
 ELEVENLABS_API_KEY=your_elevenlabs_api_key
+
+# Paid endpoints (/scan/analyze, /voice/generate) are CLOSED unless this is set;
+# callers must send it in the X-Access-Key header (the scan page has a field for it).
+ACCESS_KEY=choose_a_long_random_value
+# Optional usage limits (in-memory, reset on restart; not billing-grade):
+# SCANS_PER_IP_PER_HOUR=5  DAILY_SCAN_CAP=100  MONTHLY_VOICE_CAP=15  MAX_UPLOAD_MB=8
 ```
 
 ### 4. Seed the Disease Database
@@ -310,3 +316,19 @@ This project is licensed under the MIT License — see the [LICENSE](LICENSE) fi
 *AgriSense AI — Because every farmer deserves a crop expert in their pocket.*
 
 </div>
+
+## Safety limits of this demo
+
+- Chemical products and doses are not shown anywhere. The knowledge base has no source for them. The server drops the model's chemical section, filters every text field with a pattern list, and the voice report is composed on the server from the crop, the possible issue and the urgency only, with a fixed reminder to confirm with a local agriculture officer. The pattern filter lowers risk but does not prove that no unsafe product name can pass, and it only knows English terms.
+- Paid calls need the access key. Each Gemini call is preceded by a free token count and is refused over a per-request cap (`MAX_INPUT_TOKENS_*`) or an aggregate allowance (`TOTAL_GEMINI_CALLS_BUDGET`, `TOTAL_INPUT_TOKENS_BUDGET`). These counters live in memory and reset when the service restarts, so they are a soft limit, not a spending cap.
+
+## Retrieval notes
+
+- The Pinecone index `agrisense-diseases` stores 384-d MiniLM (`all-MiniLM-L6-v2`) vectors of
+  `Disease: {name} Crop: {crop} Symptoms: {symptoms}`. The app embeds the query locally with the
+  same model (fastembed ONNX) and sends the vector.
+- The index also has a `llama-text-embed-v2` integration configured. Do not use Pinecone text
+  search on it: that is a different embedding space and returns wrong matches.
+- Only two stored vectors (`disease_0`, `disease_22`) were checked against a local embedding; the
+  other records are assumed to follow the same seed script.
+- `PINECONE_ENVIRONMENT`, `DATABASE_URL`, `REDIS_URL` and `SECRET_KEY` are not used at runtime yet.

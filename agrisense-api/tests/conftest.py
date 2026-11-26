@@ -8,6 +8,7 @@ for key in [
     "PINECONE_ENVIRONMENT", "PINECONE_INDEX_NAME", "ELEVENLABS_API_KEY",
 ]:
     os.environ.setdefault(key, "test")
+os.environ.setdefault("ACCESS_KEY", "test-access-key")
 
 # Replace the ElevenLabs voice service with a stub so the scan route can be tested
 # without that package or any network access. The real treatment module is imported
@@ -22,3 +23,14 @@ for name, attr, fn in [
         mod = types.ModuleType(name)
         setattr(mod, attr, fn)
         sys.modules[name] = mod
+
+
+import pytest
+
+
+@pytest.fixture(autouse=True)
+def _reset_limits():
+    from app.core import limits
+    limits.reset_for_tests()
+    yield
+    limits.reset_for_tests()

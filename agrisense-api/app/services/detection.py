@@ -10,6 +10,8 @@ from PIL import Image
 import io
 from pydantic import BaseModel, Field, StrictBool, ValidationError, model_validator
 
+from app.services.guard import check_input_tokens, log_usage
+
 logger = logging.getLogger(__name__)
 
 
@@ -126,10 +128,17 @@ def parse_analysis(text: str) -> dict:
 def _call_model(processed_bytes: bytes) -> str:
     model = genai.GenerativeModel(settings.GEMINI_MODEL)
     image_part = {"mime_type": "image/jpeg", "data": processed_bytes}
+    contents = [VISION_PROMPT, image_part]
+    try:
+        check_input_tokens(model, contents, settings.MAX_INPUT_TOKENS_DETECTION, "detection")
+    except Exception as e:
+        raise AnalysisError("Detection input check failed") from e
     response = model.generate_content(
-        [VISION_PROMPT, image_part],
+        contents,
+        generation_config={"max_output_tokens": settings.MAX_OUTPUT_TOKENS_DETECTION},
         request_options={"timeout": MODEL_TIMEOUT_SECONDS},
     )
+    log_usage(response, "detection")
     return response.text
 
 

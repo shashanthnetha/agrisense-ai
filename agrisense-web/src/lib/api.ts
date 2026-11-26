@@ -10,6 +10,17 @@ const api = axios.create({
   },
 });
 
+export const ACCESS_KEY_STORAGE = 'agrisense_access_key';
+
+// The paid endpoints are closed unless the caller sends the access key (kept in this browser only).
+api.interceptors.request.use((config) => {
+  if (typeof window !== 'undefined') {
+    const key = window.localStorage.getItem(ACCESS_KEY_STORAGE);
+    if (key) config.headers.set('X-Access-Key', key);
+  }
+  return config;
+});
+
 export const analyzeCrop = async (imageFile: File, language: string = "English"): Promise<ScanResponse> => {
   const formData = new FormData();
   formData.append('image', imageFile);

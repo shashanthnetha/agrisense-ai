@@ -1,4 +1,4 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException, Form
+from fastapi import APIRouter, UploadFile, File, HTTPException, Form, Request
 from typing import Optional
 import base64
 import logging
@@ -6,6 +6,8 @@ from app.services.detection import analyze_image, AnalysisError
 from app.services.rag import query_disease_knowledge
 from app.services.treatment import generate_treatment, TreatmentError
 from app.services.voice import generate_voice
+from app.core import limits
+from app.core.config import settings
 
 # Heuristic cut-off on the model's own self-reported confidence (0-100).
 # This number is not calibrated against labelled data; treat it as a safety net.
@@ -16,11 +18,19 @@ logger = logging.getLogger(__name__)
 
 @router.post("/analyze")
 async def analyze_crop(
+    request: Request,
     image: UploadFile = File(...),
     language: str = Form("English")
 ):
+    limits.require_access(request)
+    limits.check_scan_allowed(request)
     try:
         contents = await image.read()
+        if len(contents) > settings.MAX_UPLOAD_MB * 1024 * 1024:
+            raise HTTPException(
+                status_code=413,
+                detail=f"That photo is too large. Please use a photo under {settings.MAX_UPLOAD_MB} MB.",
+            )
         analysis = await analyze_image(contents)
 
         if not isinstance(analysis.get("is_plant"), bool):
@@ -72,7 +82,8 @@ async def analyze_crop(
                 "treatment_message": "Treatment advice is unavailable right now. Please try again, or ask a local agriculture officer.",
                 "voice_data": None,
             }
-        voice_bytes = await generate_voice(analysis, treatment, language)
+        # Skip voice (not the scan) once this month's voice allowance is used up.
+        voice_bytes = await generate_voice(analysis, treatment, language) if limits.voice_allowed() else None
         
         voice_base64 = None
         if voice_bytes:
@@ -85,6 +96,8 @@ async def analyze_crop(
             "voice_data": voice_base64
         }
         
+    except HTTPException:
+        raise
     except AnalysisError:
         raise HTTPException(
             status_code=502,

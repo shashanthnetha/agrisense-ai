@@ -30,7 +30,8 @@ def client():
 
 
 def post(c):
-    return c.post("/scan/analyze", files={"image": ("a.jpg", b"123", "image/jpeg")})
+    return c.post("/scan/analyze", files={"image": ("a.jpg", b"123", "image/jpeg")},
+                  headers={"X-Access-Key": "test-access-key"})
 
 
 @pytest.fixture(autouse=True)
@@ -64,7 +65,10 @@ def test_generate_wraps_provider_error_without_leaking(monkeypatch):
 
     class Boom:
         def __init__(self, *_): pass
-        def generate_content(self, *_): raise RuntimeError(SECRET)
+        def count_tokens(self, *_, **__):
+            class T: total_tokens = 100
+            return T()
+        def generate_content(self, *_, **__): raise RuntimeError(SECRET)
 
     monkeypatch.setattr(treatment.genai, "GenerativeModel", Boom)
     with pytest.raises(TreatmentError) as e:
@@ -78,7 +82,10 @@ def test_model_name_comes_from_settings(monkeypatch):
 
     class M:
         def __init__(self, name): seen.append(name)
-        def generate_content(self, *_):
+        def count_tokens(self, *_, **__):
+            class T: total_tokens = 100
+            return T()
+        def generate_content(self, *_, **__):
             class R: text = json.dumps(PLAN)
             return R()
 

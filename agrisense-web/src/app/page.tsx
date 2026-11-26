@@ -87,7 +87,7 @@ export default function LandingPage() {
                     <Leaf className="h-8 w-8 text-primary" />
                   </div>
                   <CardTitle>Organic Treatments</CardTitle>
-                  <CardDescription>Detailed organic and chemical recovery plans drawn from a 50-disease knowledge base.</CardDescription>
+                  <CardDescription>Organic and prevention guidance drawn from a 50-disease knowledge base. Chemical advice is not shown until its sources are checked.</CardDescription>
                 </CardHeader>
               </Card>
               <Card className="border-none shadow-none bg-transparent">
