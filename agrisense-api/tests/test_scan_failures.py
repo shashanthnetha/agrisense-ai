@@ -17,7 +17,7 @@ GOOD = {
 
 @pytest.fixture(autouse=True)
 def _stub_rag(monkeypatch):
-    async def rag(disease=None, crop=None):
+    async def rag(disease=None, crop=None, **kw):
         return "ctx"
     monkeypatch.setattr(scan, "query_disease_knowledge", rag)
 
@@ -28,8 +28,16 @@ def make_client():
     return TestClient(app)
 
 
-def post(client):
-    return client.post("/scan/analyze", files={"image": ("a.jpg", b"123", "image/jpeg")},
+def _png(w=64, h=48):
+    import io
+    from PIL import Image
+    b = io.BytesIO()
+    Image.new("RGB", (w, h), (30, 120, 40)).save(b, "PNG")
+    return b.getvalue()
+
+
+def post(client, data=None, name="a.png", ctype="image/png"):
+    return client.post("/scan/analyze", files={"image": (name, data if data is not None else _png(), ctype)},
                        headers={"X-Access-Key": "test-access-key"})
 
 
@@ -221,3 +229,151 @@ def test_route_missing_confidence_is_uncertain_not_healthy(monkeypatch):
     async def odd(_): return {"is_plant": True, "disease_detected": False}
     monkeypatch.setattr(scan, "analyze_image", odd)
     assert post(make_client()).json()["status"] == "uncertain"
+
+
+# --- upload hardening -----------------------------------------------------
+
+def test_non_image_is_400_and_never_reaches_the_model(monkeypatch):
+    called = []
+    async def boom(_):
+        called.append(1)
+        return GOOD
+    monkeypatch.setattr(scan, "analyze_image", boom)
+    r = post(make_client(), data=b"hello, not an image", name="a.jpg", ctype="image/jpeg")
+    assert r.status_code == 400 and not called
+    assert "readable" in r.json()["detail"]
+
+
+def test_oversize_upload_is_413_without_buffering_it_all(monkeypatch):
+    monkeypatch.setattr(scan.settings, "MAX_UPLOAD_MB", 1)
+    r = post(make_client(), data=b"\0" * (2 * 1024 * 1024 + 5))
+    assert r.status_code == 413
+
+
+def test_gif_and_tiny_images_rejected(monkeypatch):
+    import io
+    from PIL import Image
+    b = io.BytesIO(); Image.new("RGB", (64, 64)).save(b, "GIF")
+    assert post(make_client(), data=b.getvalue(), name="a.gif", ctype="image/gif").status_code == 400
+    assert post(make_client(), data=_png(8, 8)).status_code == 400
+
+
+def test_exif_rotation_and_aspect_kept():
+    import io
+    import numpy as np
+    from PIL import Image
+    im = Image.new("RGB", (1000, 500), (0, 200, 0))
+    ex = im.getexif(); ex[0x0112] = 6  # camera says: rotate 90 to display
+    b = io.BytesIO(); im.save(b, "JPEG", exif=ex)
+    out = detection.preprocess_image(b.getvalue())
+    arr = np.asarray(Image.open(io.BytesIO(out)))
+    assert arr.shape[0] > arr.shape[1], "should be upright (portrait) after EXIF rotation"
+    assert max(arr.shape[:2]) == detection.MAX_SIDE
+    assert abs(arr.shape[0] / arr.shape[1] - 2.0) < 0.05, "aspect ratio must not be squashed"
+
+
+# --- reliability: concurrency, timeouts, language ---------------------------
+
+def test_busy_service_returns_503_and_does_not_count_the_scan(monkeypatch):
+    from app.core import limits
+    monkeypatch.setattr(scan.settings, "MAX_CONCURRENT_SCANS", 0)
+    before = limits._day["count"]
+    r = post(make_client())
+    assert r.status_code == 503 and "busy" in r.json()["detail"]
+    assert limits._day["count"] == before
+
+
+def test_slot_is_released_after_success_and_after_failure(monkeypatch):
+    async def boom(_):
+        raise AnalysisError("x")
+    monkeypatch.setattr(scan, "analyze_image", boom)
+    assert post(make_client()).status_code == 502
+    assert scan._active_scans == 0
+
+
+def test_unsupported_language_is_400():
+    r = make_client().post("/scan/analyze", data={"language": "Klingon"},
+                           files={"image": ("a.png", _png(), "image/png")},
+                           headers={"X-Access-Key": "test-access-key"})
+    assert r.status_code == 400
+
+
+def test_treatment_call_does_not_block_the_event_loop_and_times_out(monkeypatch):
+    import time
+    from app.services import treatment
+    monkeypatch.setattr(treatment.settings, "TREATMENT_TIMEOUT_SECONDS", 0)
+    def slow(prompt):
+        time.sleep(0.3)
+        return "{}"
+    monkeypatch.setattr(treatment, "_call_treatment_model", slow)
+    async def go():
+        ticks = []
+        async def ticker():
+            for _ in range(5):
+                await asyncio.sleep(0.02); ticks.append(1)
+        t = asyncio.create_task(ticker())
+        # wait_for limit is TREATMENT_TIMEOUT_SECONDS + 5 here, so shorten it for the test
+        monkeypatch.setattr(asyncio, "wait_for", lambda aw, timeout: orig(aw, 0.1))
+        try:
+            await treatment.generate_treatment({}, "ctx")
+        except treatment.TreatmentError:
+            pass
+        await t
+        return len(ticks)
+    orig = asyncio.wait_for
+    assert asyncio.run(go()) == 5  # ticker kept running while the slow call was in flight
+
+
+def test_timed_out_calls_keep_their_slot_until_the_thread_ends():
+    import threading
+    from app.services import guard
+    guard.reset_budget_for_tests()
+    gate = threading.Event()
+    started = []
+
+    def stuck():
+        started.append(1)
+        gate.wait(5)
+        return "late"
+
+    async def go():
+        
+        from app.core.config import settings
+        cap = settings.MAX_OUTSTANDING_PROVIDER_CALLS
+        for _ in range(cap):
+            with pytest.raises(asyncio.TimeoutError):
+                await guard.run_provider(stuck, timeout=0.05)
+        # every caller gave up, but all threads still run: no new provider call may start
+        assert guard.outstanding_provider_calls() == cap
+        with pytest.raises(guard.ProviderBusy):
+            await guard.run_provider(stuck, timeout=0.05)
+        assert len(started) == cap
+        gate.set()
+        for _ in range(100):
+            if guard.outstanding_provider_calls() == 0:
+                break
+            await asyncio.sleep(0.02)
+        assert guard.outstanding_provider_calls() == 0
+        assert await guard.run_provider(lambda: "ok", timeout=1) == "ok"
+    asyncio.run(go())
+
+
+def test_failed_call_gives_its_slot_back():
+    from app.services import guard
+    guard.reset_budget_for_tests()
+    def bad():
+        raise RuntimeError("x")
+    async def go():
+        for _ in range(10):
+            with pytest.raises(RuntimeError):
+                await guard.run_provider(bad, timeout=1)
+        assert guard.outstanding_provider_calls() == 0
+    asyncio.run(go())
+
+
+def test_detection_reports_busy_without_a_provider_call(monkeypatch):
+    from app.services import guard
+    monkeypatch.setattr(detection, "_call_model", lambda b: pytest.fail("provider called"))
+    monkeypatch.setattr(detection.settings, "MAX_OUTSTANDING_PROVIDER_CALLS", 0)
+    with pytest.raises(AnalysisError):
+        asyncio.run(detection.analyze_image(b"x"))
