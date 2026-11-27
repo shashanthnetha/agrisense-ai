@@ -110,3 +110,34 @@ def test_generation_switch_off_refuses_even_with_a_valid_key(monkeypatch):
 def test_generation_switch_defaults_to_off():
     from app.core.config import Settings
     assert Settings.model_fields["GENERATION_ENABLED"].default is False
+
+
+def test_scan_never_makes_audio(monkeypatch):
+    from app.api.v1 import scan as scan_mod
+    assert not hasattr(scan_mod, "generate_voice")
+
+
+def test_repeat_voice_request_uses_cache_and_one_provider_call(monkeypatch):
+    import asyncio
+    import importlib.util
+    import pathlib
+    from app.services import treatment as t
+    path = pathlib.Path(t.__file__).with_name("voice.py")
+    spec = importlib.util.spec_from_file_location("real_voice_cache_test", path)
+    v = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(v)
+    calls = []
+
+    def fake(script, language):
+        calls.append(language)
+        return b"audio"
+    monkeypatch.setattr(v, "_speak", fake)
+    a = {"crop_type": "Tomato", "disease_name": "Early Blight", "urgency": "Low"}
+
+    async def go():
+        r = await asyncio.gather(*[v.generate_voice(a, {}, "English") for _ in range(3)])
+        r.append(await v.generate_voice(a, {}, "English"))
+        return r
+    out = asyncio.run(go())
+    assert out == [b"audio"] * 4 and len(calls) == 1
+    assert v.cached_voice(a, "English") == b"audio" and v.cached_voice(a, "Hindi") is None

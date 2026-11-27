@@ -120,16 +120,6 @@ def test_route_unexpected_treatment_exception_is_generic_500(monkeypatch):
     assert r.status_code == 500 and SECRET not in r.text
 
 
-def test_voice_failure_is_non_fatal(monkeypatch):
-    async def plan(*a, **k): return PLAN
-    async def no_voice(*a, **k): return None
-
-    monkeypatch.setattr(scan, "generate_treatment", plan)
-    monkeypatch.setattr(scan, "generate_voice", no_voice)
-    body = post(client()).json()
-    assert body["treatment"] and body["voice_data"] is None
-
-
 def test_default_model_is_gemini_3_5_flash_lite():
     from app.core.config import Settings
     assert Settings.model_fields["GEMINI_MODEL"].default == "gemini-3.5-flash-lite"

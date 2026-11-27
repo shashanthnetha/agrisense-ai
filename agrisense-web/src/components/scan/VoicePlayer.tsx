@@ -6,7 +6,6 @@ import { generateVoice } from '@/lib/api';
 import { Analysis, Treatment } from '@/lib/types';
 
 interface VoicePlayerProps {
-  base64Audio: string | null;
   analysis?: Analysis;
   treatment?: Treatment | null;
   onLanguageChange: (lang: string) => void;
@@ -15,63 +14,81 @@ interface VoicePlayerProps {
 
 const LANGUAGES = ['English', 'Hindi', 'Tamil', 'Telugu'];
 
-export function VoicePlayer({ base64Audio, analysis, treatment, onLanguageChange, currentLanguage }: VoicePlayerProps) {
+export function VoicePlayer({ analysis, treatment, onLanguageChange, currentLanguage }: VoicePlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [audioSrc, setAudioSrc] = useState<string | null>(null);
+  // Audio is made only when someone taps Listen. Clips are kept by language, so listening again
+  // never asks the server a second time.
+  const [clips, setClips] = useState<Record<string, string>>({});
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const busy = useRef(false); // blocks a second request while one is running
+  const autoplay = useRef(false);
+  const audioSrc = clips[currentLanguage] ?? null;
 
   useEffect(() => {
-    setAudioSrc(base64Audio ? `data:audio/mp3;base64,${base64Audio}` : null);
-  }, [base64Audio]);
+    if (autoplay.current && audioSrc && audioRef.current) {
+      autoplay.current = false;
+      audioRef.current.play().catch(() => {}); // if the browser blocks it, tapping Listen plays it
+    }
+  }, [audioSrc]);
 
-  const togglePlay = async () => {
-    const el = audioRef.current;
-    if (!el || !audioSrc) return;
-    if (isPlaying) {
-      el.pause();
-      return;
-    }
-    try {
-      await el.play();
-    } catch {
-      setError('Could not play the audio on this device.');
-    }
+  const handleLanguageChange = (lang: string) => {
+    audioRef.current?.pause();
+    setError(null);
+    onLanguageChange(lang);
   };
 
-  const handleLanguageChange = async (lang: string) => {
-    onLanguageChange(lang);
-    if (!analysis || !treatment) return;
+  const listen = async () => {
+    const el = audioRef.current;
+    if (isPlaying) {
+      el?.pause();
+      return;
+    }
+    if (audioSrc) {
+      try {
+        await el?.play();
+      } catch {
+        setError('Could not play the audio on this device.');
+      }
+      return;
+    }
+    if (busy.current || !analysis || !treatment) return;
+    busy.current = true;
     setIsLoading(true);
     setError(null);
-    audioRef.current?.pause();
+    const lang = currentLanguage;
     try {
       const data = await generateVoice(analysis, treatment, lang);
       if (data) {
-        setAudioSrc(`data:audio/mp3;base64,${data}`);
+        autoplay.current = true;
+        setClips((c) => ({ ...c, [lang]: `data:audio/mp3;base64,${data}` }));
       } else {
-        setAudioSrc(null);
-        setError(`Voice in ${lang} is unavailable right now.`);
+        setError(`Audio in ${lang} is unavailable right now.`);
       }
-    } catch {
-      setAudioSrc(null);
-      setError(`Voice in ${lang} is unavailable right now.`);
+    } catch (e) {
+      const status = (e as { response?: { status?: number } })?.response?.status;
+      setError(
+        status === 503
+          ? 'Audio is not available right now.'
+          : status === 429
+            ? 'The audio limit has been reached for now.'
+            : `Audio in ${lang} is unavailable right now.`,
+      );
     } finally {
+      busy.current = false;
       setIsLoading(false);
     }
   };
-
-  const unavailable = !audioSrc && !isLoading;
 
   return (
     <section aria-label="Listen to the report" className="rounded-xl border border-line bg-card p-3">
       <div className="flex items-center gap-4">
         <button
           type="button"
-          onClick={togglePlay}
-          disabled={!audioSrc || isLoading}
-          aria-label={isPlaying ? 'Pause audio' : 'Play audio'}
+          onClick={listen}
+          disabled={isLoading}
+          aria-label={isPlaying ? 'Pause audio' : 'Listen to the report'}
           className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-ink text-paper transition-[transform,background-color] duration-150 hover:bg-ink/85 active:scale-[0.97] disabled:bg-raised disabled:text-ink-3"
         >
           {isLoading ? (
@@ -84,7 +101,7 @@ export function VoicePlayer({ base64Audio, analysis, treatment, onLanguageChange
         </button>
         <div className="min-w-0 flex-1">
           <p className="text-[15px] leading-[20px]">Listen to the report</p>
-          <p className="label">{isPlaying ? 'Playing' : isLoading ? 'Preparing audio' : 'Read aloud'}</p>
+          <p className="label">{isPlaying ? 'Playing' : isLoading ? 'Preparing audio' : audioSrc ? 'Ready' : 'Tap to hear it read aloud'}</p>
         </div>
         <label className="flex items-center gap-2">
           <span className="sr-only">Language</span>
@@ -101,9 +118,9 @@ export function VoicePlayer({ base64Audio, analysis, treatment, onLanguageChange
         </label>
       </div>
 
-      {(error || unavailable) && (
+      {error && (
         <p role="status" className="mt-3 text-[13px] leading-[20px] text-madder">
-          {error ?? 'Audio is not available for this report.'}
+          {error}
         </p>
       )}
 

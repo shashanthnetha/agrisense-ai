@@ -29,6 +29,14 @@ class Settings(BaseSettings):
     # Master switch for every paid provider call. Off unless explicitly set to true, so a present
     # ACCESS_KEY alone never lets a scan spend money.
     GENERATION_ENABLED: bool = False
+    # Temporary public demo window. Off by default. When on, scanning needs no access key, but only
+    # until PUBLIC_UNTIL (ISO 8601 with a timezone, e.g. 2026-11-27T23:59:00+05:30) and only for
+    # SCAN_TOTAL_CAP scans counted in the database at DATABASE_URL. If any of the three is missing,
+    # expired or unreachable, scanning is refused. Audio stays off unless PUBLIC_VOICE_ENABLED is true.
+    PUBLIC_MODE: bool = False
+    PUBLIC_UNTIL: Optional[str] = None
+    SCAN_TOTAL_CAP: int = 0
+    PUBLIC_VOICE_ENABLED: bool = False
 
     # Usage limits (in-memory safety nets for paid or quota-limited APIs)
     SCANS_PER_IP_PER_HOUR: int = 5

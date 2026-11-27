@@ -42,6 +42,11 @@ def require_access(request: Request) -> None:
     """
     if not settings.GENERATION_ENABLED:
         raise HTTPException(status_code=503, detail="Scanning is not open right now.")
+    if settings.PUBLIC_MODE:
+        # Temporary public demo: no key, but only inside the window and allowance (see app.core.cap).
+        from app.core import cap
+        cap.check_window()
+        return
     expected = settings.ACCESS_KEY
     if not expected:
         raise HTTPException(status_code=503, detail="Scanning is not open right now.")
