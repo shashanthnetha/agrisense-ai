@@ -117,9 +117,9 @@ async def _analyze(request: Request, image: UploadFile, language: str):
             crop=analysis.get("crop_type"),
             symptoms=analysis.get("visible_symptoms"),
         )
-        if rag_context == NO_MATCH_CONTEXT:
-            # Nothing in the reference notes fits. Do not let the model write a plan from memory
-            # and do not read one aloud: the diagnosis stays a reading to check, not a basis for treatment.
+        if rag_context in (NO_MATCH_CONTEXT, "Error retrieving knowledge."):
+            # No usable reference knowledge (no match, or retrieval failed): do not let the model
+            # write a plan from memory and do not read one aloud.
             return {
                 "status": "disease_detected",
                 "analysis": analysis,
