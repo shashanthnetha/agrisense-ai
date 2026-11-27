@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import re
 import google.generativeai as genai
@@ -5,7 +6,7 @@ from elevenlabs.client import ElevenLabs
 from app.core.config import settings
 
 from app.services.safety import clean_text, has_chemical_advice
-from app.services.guard import check_input_tokens, log_usage
+from app.services.guard import check_input_tokens, log_usage, run_provider
 
 logger = logging.getLogger(__name__)
 
@@ -33,6 +34,33 @@ def _urgency(value) -> str:
     return value if value in ("Low", "Medium", "High") else "not stated"
 
 
+def _speak(script: str, language: str) -> bytes:
+    """Blocking provider calls (translation, text to speech). Runs in a worker thread."""
+    if language != "English":
+        model = genai.GenerativeModel(settings.GEMINI_MODEL)
+        prompt = (
+            f"Translate this agricultural report to {LANGUAGE_NAMES[language]}. "
+            f"Keep it natural and clear for farmers. Translate only. Add nothing, and do not add any product names or doses. Only return the translated text, nothing else:\n\n{script}"
+        )
+        check_input_tokens(model, prompt, settings.MAX_INPUT_TOKENS_TRANSLATION, "translation")
+        response = model.generate_content(
+            prompt,
+            generation_config={"max_output_tokens": settings.MAX_OUTPUT_TOKENS_TRANSLATION},
+            request_options={"timeout": settings.VOICE_TIMEOUT_SECONDS},
+        )
+        log_usage(response, "translation")
+        script, _ = clean_text(response.text, "Please ask a local agriculture officer for advice.")
+
+    script = script[: settings.MAX_VOICE_CHARS]
+    audio = client.text_to_speech.convert(
+        text=script,
+        voice_id="ErXwobaYiN019PkySvjV",
+        model_id="eleven_multilingual_v2",
+        output_format="mp3_44100_128"
+    )
+    return b"".join(audio)
+
+
 async def generate_voice(analysis: dict, treatment: dict, language: str = "English"):
     try:
         # The spoken report is composed here from bounded fields only. Free text from the
@@ -46,32 +74,11 @@ async def generate_voice(analysis: dict, treatment: dict, language: str = "Engli
             "Please confirm with a local agriculture officer before taking any action."
         )
 
-        # Translate if not English
-        if language != "English":
-            model = genai.GenerativeModel(settings.GEMINI_MODEL)
-            prompt = (
-                f"Translate this agricultural report to {LANGUAGE_NAMES[language]}. "
-                f"Keep it natural and clear for farmers. Translate only. Add nothing, and do not add any product names or doses. Only return the translated text, nothing else:\n\n{script}"
-            )
-            check_input_tokens(model, prompt, settings.MAX_INPUT_TOKENS_TRANSLATION, "translation")
-            response = model.generate_content(
-                prompt,
-                generation_config={"max_output_tokens": settings.MAX_OUTPUT_TOKENS_TRANSLATION},
-            )
-            log_usage(response, "translation")
-            script, _ = clean_text(response.text, "Please ask a local agriculture officer for advice.")
-
-        script = script[: settings.MAX_VOICE_CHARS]
-        audio = client.text_to_speech.convert(
-            text=script,
-            voice_id="ErXwobaYiN019PkySvjV",
-            model_id="eleven_multilingual_v2",
-            output_format="mp3_44100_128"
-        )
-
-        audio_bytes = b"".join(audio)
-        return audio_bytes
+        if language not in LANGUAGE_NAMES:
+            logger.warning("Voice requested for an unsupported language")
+            return None
+        return await run_provider(_speak, script, language, timeout=settings.VOICE_TIMEOUT_SECONDS + 5)
 
     except Exception as e:
-        logger.error(f"Voice generation error: {e}")
+        logger.error("Voice generation error: %s", type(e).__name__)
         return None
