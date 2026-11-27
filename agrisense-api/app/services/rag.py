@@ -175,7 +175,7 @@ async def query_disease_knowledge(disease: str, crop: str, symptoms: Optional[Se
         # The embedding model and the Pinecone call are blocking: keep them off the event loop.
         matches = await run_provider(_query_sync, disease, crop, timeout=RAG_TIMEOUT_SECONDS)
         context = build_context(matches)
-        return context if context else "No specific knowledge found in vector database."
+        return context if context else NO_MATCH_CONTEXT
     except Exception as e:
-        logger.error(f"Error querying Pinecone: {e}")
+        logger.error("Error querying Pinecone (%s): %s", type(e).__name__, e)
         return "Error retrieving knowledge."
