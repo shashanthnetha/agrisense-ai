@@ -165,6 +165,10 @@ ACCESS_KEY=choose_a_long_random_value
 GENERATION_ENABLED=false
 # Optional usage limits (in-memory, reset on restart; not billing-grade):
 # SCANS_PER_IP_PER_HOUR=5  DAILY_SCAN_CAP=100  MONTHLY_VOICE_CAP=15  MAX_UPLOAD_MB=8
+# Temporary public demo (off by default). Needs all of these; if any is missing, expired or the
+# database is unreachable, scanning is refused. The total is counted in Postgres, so it survives restarts.
+# PUBLIC_MODE=true  PUBLIC_UNTIL=2026-11-27T23:59:00+05:30  SCAN_TOTAL_CAP=25  DATABASE_URL=postgresql://...
+# Audio is made only when someone taps Listen, and stays off in public mode unless PUBLIC_VOICE_ENABLED=true.
 ```
 
 ### 4. Seed the Disease Database
