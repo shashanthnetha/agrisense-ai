@@ -88,10 +88,15 @@ def test_min_score_ignored_when_metric_unknown(wired, monkeypatch):
     assert "Name: A" in run(rag.query_disease_knowledge("x", "Rice"))
 
 
-def test_everything_filtered_out_says_no_knowledge(wired, monkeypatch):
+def test_everything_filtered_out_abstains_with_no_match(wired, monkeypatch):
     wired([match("Weak", "Rice", 0.3)], [])
     monkeypatch.setenv("RAG_MIN_SCORE", "0.6")
-    assert run(rag.query_disease_knowledge("x", "Rice")).startswith("No specific knowledge")
+    assert run(rag.query_disease_knowledge("x", "Rice")) == rag.NO_MATCH_CONTEXT
+
+
+def test_empty_result_abstains_with_no_match(wired):
+    wired([], [])
+    assert run(rag.query_disease_knowledge("x", "Rice")) == rag.NO_MATCH_CONTEXT
 
 
 def test_invalid_min_score_is_ignored(wired, monkeypatch):
