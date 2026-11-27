@@ -40,6 +40,8 @@ def require_access(request: Request) -> None:
 
     The key is compared in constant time. With no ACCESS_KEY configured every call is refused.
     """
+    if not settings.GENERATION_ENABLED:
+        raise HTTPException(status_code=503, detail="Scanning is not open right now.")
     expected = settings.ACCESS_KEY
     if not expected:
         raise HTTPException(status_code=503, detail="Scanning is not open right now.")
