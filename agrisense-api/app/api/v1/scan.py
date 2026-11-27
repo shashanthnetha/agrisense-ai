@@ -5,8 +5,7 @@ import logging
 from app.services.detection import analyze_image, AnalysisError, InvalidImage, validate_image
 from app.services.rag import query_disease_knowledge, NO_MATCH_CONTEXT
 from app.services.treatment import generate_treatment, TreatmentError
-from app.services.voice import generate_voice
-from app.core import limits
+from app.core import cap, limits
 from app.core.config import settings
 
 # Heuristic cut-off on the model's own self-reported confidence (0-100).
@@ -75,6 +74,9 @@ async def _analyze(request: Request, image: UploadFile, language: str):
                 status_code=400,
                 detail="That file is not a readable JPG or PNG photo. Please choose a photo of a leaf.",
             )
+        if settings.PUBLIC_MODE:
+            # Take a durable slot before any paid call. It is not returned if the scan later fails.
+            await cap.reserve_scan()
         analysis = await analyze_image(contents)
 
         if not isinstance(analysis.get("is_plant"), bool):
@@ -139,19 +141,13 @@ async def _analyze(request: Request, image: UploadFile, language: str):
                 "treatment_message": "Treatment advice is unavailable right now. Please try again, or ask a local agriculture officer.",
                 "voice_data": None,
             }
-        # Skip voice (not the scan) once this month's voice allowance is used up.
-        voice_bytes = await generate_voice(analysis, treatment, language) if limits.voice_allowed() else None
-        
-        voice_base64 = None
-        if voice_bytes:
-            voice_base64 = base64.b64encode(voice_bytes).decode('utf-8')
-            
+        # Audio is never made during a scan. The page asks for it only when the person taps Listen.
         return {
             "status": "disease_detected",
             "analysis": analysis,
             "treatment": treatment,
             "knowledge_match": knowledge_match,
-            "voice_data": voice_base64
+            "voice_data": None,
         }
         
     except HTTPException:
