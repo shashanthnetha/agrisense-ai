@@ -208,6 +208,31 @@ def test_explicit_healthy_result(monkeypatch):
     assert r.status_code == 200 and r.json()["status"] == "healthy"
 
 
+def test_retrieval_error_abstains_without_treatment(monkeypatch):
+    async def ok(_): return GOOD
+    async def rag_error(disease=None, crop=None, **kw): return "Error retrieving knowledge."
+    async def plan(*a, **k): raise AssertionError("treatment must not run without reference knowledge")
+    monkeypatch.setattr(scan, "analyze_image", ok)
+    monkeypatch.setattr(scan, "query_disease_knowledge", rag_error)
+    monkeypatch.setattr(scan, "generate_treatment", plan)
+    r = post(make_client())
+    body = r.json()
+    assert r.status_code == 200 and body["status"] == "disease_detected"
+    assert body["treatment"] is None and body["knowledge_match"] == "none"
+    assert body["treatment_message"] and body["voice_data"] is None
+
+
+def test_no_knowledge_match_abstains_without_treatment(monkeypatch):
+    async def ok(_): return GOOD
+    async def rag_none(disease=None, crop=None, **kw): return scan.NO_MATCH_CONTEXT
+    async def plan(*a, **k): raise AssertionError("treatment must not run without reference knowledge")
+    monkeypatch.setattr(scan, "analyze_image", ok)
+    monkeypatch.setattr(scan, "query_disease_knowledge", rag_none)
+    monkeypatch.setattr(scan, "generate_treatment", plan)
+    body = post(make_client()).json()
+    assert body["treatment"] is None and body["knowledge_match"] == "none" and body["treatment_message"]
+
+
 def test_disease_path_still_works(monkeypatch):
     async def ok(_): return GOOD
     async def plan(*a, **k): return {"immediate_action": "x"}
