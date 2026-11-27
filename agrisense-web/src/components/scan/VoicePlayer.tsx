@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Play, Pause, Volume2 } from 'lucide-react';
+import { Play, Pause } from 'lucide-react';
 import { generateVoice } from '@/lib/api';
 import { Analysis, Treatment } from '@/lib/types';
 
@@ -14,8 +14,6 @@ interface VoicePlayerProps {
 }
 
 const LANGUAGES = ['English', 'Hindi', 'Tamil', 'Telugu'];
-// Fixed bar heights: no randomness, so the player does not jump on re-render.
-const BARS = [10, 18, 12, 24, 16, 28, 14, 22, 10, 26, 18, 12, 24, 16, 28, 20, 12, 22, 14, 26];
 
 export function VoicePlayer({ base64Audio, analysis, treatment, onLanguageChange, currentLanguage }: VoicePlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -67,19 +65,34 @@ export function VoicePlayer({ base64Audio, analysis, treatment, onLanguageChange
   const unavailable = !audioSrc && !isLoading;
 
   return (
-    <section aria-label="Listen to the report" className="rounded-3xl bg-slate-900 p-4 text-white">
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <Volume2 className="h-4 w-4 text-green-400" aria-hidden />
-          <p className="text-sm font-semibold">Listen to the report</p>
+    <section aria-label="Listen to the report" className="rounded-xl border border-line bg-card p-3">
+      <div className="flex items-center gap-4">
+        <button
+          type="button"
+          onClick={togglePlay}
+          disabled={!audioSrc || isLoading}
+          aria-label={isPlaying ? 'Pause audio' : 'Play audio'}
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-ink text-paper transition-[transform,background-color] duration-150 hover:bg-ink/85 active:scale-[0.97] disabled:bg-raised disabled:text-ink-3"
+        >
+          {isLoading ? (
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" aria-hidden />
+          ) : isPlaying ? (
+            <Pause className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+          ) : (
+            <Play className="ml-0.5 h-4 w-4" strokeWidth={1.5} aria-hidden />
+          )}
+        </button>
+        <div className="min-w-0 flex-1">
+          <p className="text-[15px] leading-[20px]">Listen to the report</p>
+          <p className="label">{isPlaying ? 'Playing' : isLoading ? 'Preparing audio' : 'Read aloud'}</p>
         </div>
-        <label className="flex items-center gap-2 text-xs text-slate-300">
-          <span className="sr-only sm:not-sr-only">Language</span>
+        <label className="flex items-center gap-2">
+          <span className="sr-only">Language</span>
           <select
             value={currentLanguage}
             onChange={(e) => handleLanguageChange(e.target.value)}
             disabled={isLoading}
-            className="h-10 rounded-lg border border-slate-600 bg-slate-800 px-3 text-sm text-white"
+            className="h-10 rounded-lg border border-line bg-paper px-3 text-[14px] text-ink"
           >
             {LANGUAGES.map((l) => (
               <option key={l} value={l}>{l}</option>
@@ -88,31 +101,8 @@ export function VoicePlayer({ base64Audio, analysis, treatment, onLanguageChange
         </label>
       </div>
 
-      <div className="mt-3 flex items-center gap-4">
-        <button
-          type="button"
-          onClick={togglePlay}
-          disabled={!audioSrc || isLoading}
-          aria-label={isPlaying ? 'Pause audio' : 'Play audio'}
-          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-green-600 hover:bg-green-500 disabled:bg-slate-700"
-        >
-          {isLoading ? (
-            <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" aria-hidden />
-          ) : isPlaying ? (
-            <Pause className="h-5 w-5" aria-hidden />
-          ) : (
-            <Play className="ml-0.5 h-5 w-5" aria-hidden />
-          )}
-        </button>
-        <div className="flex h-8 flex-1 items-center gap-1" aria-hidden>
-          {BARS.map((h, i) => (
-            <div key={i} className={`flex-1 rounded-full ${isPlaying ? 'bg-green-500' : 'bg-slate-600'}`} style={{ height: h }} />
-          ))}
-        </div>
-      </div>
-
       {(error || unavailable) && (
-        <p role="status" className="mt-3 text-xs text-amber-300">
+        <p role="status" className="mt-3 text-[13px] leading-[20px] text-madder">
           {error ?? 'Audio is not available for this report.'}
         </p>
       )}

@@ -1,11 +1,15 @@
 import asyncio
 import logging
 import os
-from typing import List, Optional
+from typing import List, Optional, Sequence
+
+from app.services import retrieval
+from app.services.guard import run_provider
 
 logger = logging.getLogger(__name__)
 
 TOP_K = 3
+RAG_TIMEOUT_SECONDS = 15
 
 # Optional minimum similarity score for a retrieved match. Off by default.
 #
@@ -19,6 +23,31 @@ SIMILARITY_METRICS = {"cosine", "dotproduct"}
 _embedder = None
 _index = None
 _metric: Optional[str] = None
+
+
+# Returned instead of knowledge when no entry fits. Distinct from "Error retrieving knowledge."
+NO_MATCH_CONTEXT = (
+    "NO MATCHING ENTRY: the knowledge base has no entry that fits these symptoms. "
+    "Do not name or assume a specific disease from the knowledge base."
+)
+
+
+def _mode() -> str:
+    """RAG_MODE=symptom turns on symptom-aware retrieval. Default stays the original name lookup."""
+    return "symptom" if os.getenv("RAG_MODE", "").strip().lower() == "symptom" else "legacy"
+
+
+def _namespace() -> Optional[str]:
+    return os.getenv("RAG_NAMESPACE", "").strip() or None
+
+
+def _unknown_threshold() -> float:
+    raw = os.getenv("RAG_UNKNOWN_THRESHOLD")
+    try:
+        return float(raw) if raw else retrieval.DEFAULT_UNKNOWN_THRESHOLD
+    except ValueError:
+        logger.warning("Ignoring invalid RAG_UNKNOWN_THRESHOLD")
+        return retrieval.DEFAULT_UNKNOWN_THRESHOLD
 
 
 def _min_score() -> Optional[float]:
@@ -117,10 +146,34 @@ def _query_sync(disease: Optional[str], crop: Optional[str]) -> List:
     return select_matches(matches, _min_score(), _metric)
 
 
-async def query_disease_knowledge(disease: str, crop: str):
+def _query_symptoms_sync(symptoms: Sequence[str], crop: Optional[str]) -> List:
+    """Read-only query by observed symptoms; the predicted disease name is not used."""
+    _load()
+    vector = _embedder.encode(retrieval.build_query(symptoms, crop)).tolist()
+    kwargs = {"vector": vector, "top_k": TOP_K, "include_metadata": True}
+    ns = _namespace()
+    if ns:
+        kwargs["namespace"] = ns
+    crop_name = _clean_crop(crop)
+    if crop_name:
+        # A named crop with no entries means "not in the knowledge base": do not borrow another crop's entry.
+        matches = list(_index.query(filter={"crop": {"$eq": crop_name}}, **kwargs).matches)
+    else:
+        matches = list(_index.query(**kwargs).matches)
+    top = matches[0].score if matches else None
+    if retrieval.decide(top, _unknown_threshold()) == retrieval.UNKNOWN:
+        return []
+    # Keep only entries that are themselves above the threshold.
+    return [m for m in matches if m.score is not None and m.score >= _unknown_threshold()]
+
+
+async def query_disease_knowledge(disease: str, crop: str, symptoms: Optional[Sequence[str]] = None):
     try:
+        if _mode() == "symptom" and symptoms:
+            matches = await run_provider(_query_symptoms_sync, symptoms, crop, timeout=RAG_TIMEOUT_SECONDS)
+            return build_context(matches) if matches else NO_MATCH_CONTEXT
         # The embedding model and the Pinecone call are blocking: keep them off the event loop.
-        matches = await asyncio.to_thread(_query_sync, disease, crop)
+        matches = await run_provider(_query_sync, disease, crop, timeout=RAG_TIMEOUT_SECONDS)
         context = build_context(matches)
         return context if context else "No specific knowledge found in vector database."
     except Exception as e:

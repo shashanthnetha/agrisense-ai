@@ -99,6 +99,23 @@ def test_voice_script_ignores_free_text(monkeypatch):
     assert "local agriculture officer" in t
 
 
+def test_voice_unsupported_language_makes_no_provider_call(monkeypatch):
+    import asyncio
+    import importlib.util, pathlib, sys, types
+    fake = types.ModuleType("elevenlabs.client")
+    fake.ElevenLabs = lambda **k: None
+    monkeypatch.setitem(sys.modules, "elevenlabs", types.ModuleType("elevenlabs"))
+    monkeypatch.setitem(sys.modules, "elevenlabs.client", fake)
+    path = pathlib.Path(treatment.__file__).with_name("voice.py")
+    spec = importlib.util.spec_from_file_location("real_voice_lang_test", path)
+    v = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(v)
+    called = []
+    monkeypatch.setattr(v, "_speak", lambda *a: called.append(1) or b"x")
+    assert asyncio.run(v.generate_voice({}, {}, "Klingon")) is None and not called
+    assert asyncio.run(v.generate_voice({}, {}, "English")) == b"x" and called
+
+
 def test_aggregate_budget_blocks(monkeypatch):
     from app.core.config import settings
     from app.services.guard import BudgetExceeded, reset_budget_for_tests
@@ -138,3 +155,28 @@ def test_recovery_timeline_never_shown():
     from app.services.safety import sanitize_plan
     out = sanitize_plan({"recovery_timeline": "7-10 days"})
     assert "7-10" not in out["recovery_timeline"] and "unsourced" in out["recovery_timeline"]
+
+
+def test_burning_and_schedules_are_dropped_everywhere():
+    from app.services.safety import sanitize_plan, has_unsupported_practice
+    for t in ["Remove and burn the worst-affected leaves today.", "Removal and burning of infected whips.",
+              "Spray the extract every 7 days.", "Repeat weekly.", "Apply twice a week.", "Spray every 7-10 days"]:
+        assert has_unsupported_practice(t), t
+    plan = {
+        "immediate_action": "Remove and burn the worst-affected leaves today. Keep tools clean.",
+        "organic_treatment": {"method": "Spray neem extract every 7 days. Remove infected leaves.", "materials": ["Neem extract", "Fire pit for burning"], "dosage": "x"},
+        "prevention_tips": ["Rotate crops", "Burn stubble after harvest", "Check weekly"],
+        "recovery_timeline": "10-14 days", "warning_signs": "Spread to new leaves. Repeat the spray daily.",
+    }
+    out = sanitize_plan(plan)
+    blob = repr(out).lower()
+    for bad in ["burn", "every 7", "weekly", "daily", "fire pit"]:
+        assert bad not in blob, bad
+    assert "keep tools clean" in blob and "rotate crops" in blob
+    assert out["recovery_timeline"].startswith("Not shown")
+    assert "10-14" not in blob
+
+
+def test_water_once_dry_is_not_a_schedule():
+    from app.services.safety import has_unsupported_practice
+    assert not has_unsupported_practice("Water once the soil is dry.")

@@ -26,12 +26,22 @@ class Settings(BaseSettings):
     
     # Paid endpoints refuse every call unless this is set and the caller sends it (X-Access-Key)
     ACCESS_KEY: Optional[str] = None
+    # Master switch for every paid provider call. Off unless explicitly set to true, so a present
+    # ACCESS_KEY alone never lets a scan spend money.
+    GENERATION_ENABLED: bool = False
 
     # Usage limits (in-memory safety nets for paid or quota-limited APIs)
     SCANS_PER_IP_PER_HOUR: int = 5
     DAILY_SCAN_CAP: int = 100
     MONTHLY_VOICE_CAP: int = 15
     MAX_UPLOAD_MB: int = 8
+    # Scans handled at once in this process (the free Render instance has 512 MB). Extra requests get a 503.
+    MAX_CONCURRENT_SCANS: int = 2
+    # Wall-clock limits for the blocking provider calls made after detection
+    # Provider calls that may still be running in worker threads, including ones whose caller timed out
+    MAX_OUTSTANDING_PROVIDER_CALLS: int = 4
+    TREATMENT_TIMEOUT_SECONDS: int = 40
+    VOICE_TIMEOUT_SECONDS: int = 60
     # Output caps for every Gemini call (bounds cost per call)
     MAX_OUTPUT_TOKENS_DETECTION: int = 1200
     MAX_OUTPUT_TOKENS_TREATMENT: int = 2000

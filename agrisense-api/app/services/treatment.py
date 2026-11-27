@@ -1,3 +1,4 @@
+import asyncio
 import google.generativeai as genai
 import json
 import logging
@@ -6,7 +7,7 @@ from pydantic import BaseModel, ValidationError
 from app.core.config import settings
 
 from app.services.safety import CHEMICAL_NOTICE, sanitize_plan
-from app.services.guard import check_input_tokens, log_usage
+from app.services.guard import check_input_tokens, log_usage, run_provider, ProviderBusy
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +20,7 @@ Based on the following AI analysis and retrieved disease knowledge, create a com
 AI Analysis: {analysis_json}
 Retrieved Knowledge: {rag_context}
 
-Rules: do NOT name any pesticide, fungicide, insecticide, herbicide or other agrochemical, and do NOT give any chemical or spray dose, in any field. Describe only cultural and organic practices. The app shows chemical advice separately.
+Rules: do NOT name any pesticide, fungicide, insecticide, herbicide or other agrochemical, and do NOT give any chemical or spray dose, in any field. Describe only cultural and organic practices, and prefer practices that appear in the Retrieved Knowledge; if it has none for this problem, say so and tell the farmer to ask a local agriculture officer. Do NOT tell the farmer to burn anything, do NOT give spray or treatment schedules (no 'every 7 days', 'weekly'), and do NOT predict recovery. The app shows chemical advice separately.
 
 Return ONLY a valid JSON object in this format:
 {{
@@ -30,7 +31,7 @@ Return ONLY a valid JSON object in this format:
     "dosage": "Leave as: Ask a local agriculture officer"
   }},
   "prevention_tips": ["Prevention 1", "Prevention 2"],
-  "recovery_timeline": "Estimated days for recovery",
+  "recovery_timeline": "Leave as: Not given",
   "warning_signs": "What to watch out for if treatment fails"
 }}
 """
@@ -68,23 +69,39 @@ def parse_treatment(text: str) -> dict:
         raise TreatmentError("Treatment output was not a valid plan") from e
 
 
+def _call_treatment_model(prompt: str) -> str:
+    """Blocking provider call. Runs in a worker thread, never on the event loop."""
+    model = genai.GenerativeModel(settings.GEMINI_MODEL)
+    check_input_tokens(model, prompt, settings.MAX_INPUT_TOKENS_TREATMENT, "treatment")
+    response = model.generate_content(
+        prompt,
+        generation_config={"max_output_tokens": settings.MAX_OUTPUT_TOKENS_TREATMENT},
+        request_options={"timeout": settings.TREATMENT_TIMEOUT_SECONDS},
+    )
+    log_usage(response, "treatment")
+    return response.text
+
+
 async def generate_treatment(analysis: dict, rag_context: str):
     """Return a validated treatment plan, or raise TreatmentError."""
     try:
-        model = genai.GenerativeModel(settings.GEMINI_MODEL)
         prompt = TREATMENT_PROMPT.format(
             analysis_json=json.dumps(analysis),
             rag_context=rag_context
         )
-        check_input_tokens(model, prompt, settings.MAX_INPUT_TOKENS_TREATMENT, "treatment")
-        response = model.generate_content(
-            prompt, generation_config={"max_output_tokens": settings.MAX_OUTPUT_TOKENS_TREATMENT}
+        text = await run_provider(
+            _call_treatment_model, prompt, timeout=settings.TREATMENT_TIMEOUT_SECONDS + 5,
         )
-        log_usage(response, "treatment")
-        return parse_treatment(response.text)
+        return parse_treatment(text)
     except TreatmentError:
         logger.error("Treatment generation returned an unusable plan")
         raise
+    except ProviderBusy as e:
+        logger.error("Treatment skipped: provider calls still running")
+        raise TreatmentError("Provider busy") from e
+    except asyncio.TimeoutError as e:
+        logger.error("Treatment call exceeded the wall-clock limit")
+        raise TreatmentError("Treatment generation timed out") from e
     except Exception as e:
         logger.error(f"Treatment generation error: {e}")
         raise TreatmentError("Treatment generation failed") from e

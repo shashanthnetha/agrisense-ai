@@ -6,7 +6,9 @@ app does not show chemical recommendations. This is enforced in code on the serv
 - retrieved knowledge never includes chemical fields (rag.build_context),
 - the treatment plan's chemical section is always replaced by a notice,
 - every free-text field and the voice script are scanned, and text that names an
-  agrochemical, a formulation code or a chemical-style dose is removed.
+  agrochemical, a formulation code or a chemical-style dose is removed,
+- text that tells the user to burn crop residue, or gives a spray or treatment schedule
+  (every 7 days, weekly), is removed too: no source backs it for the user's place.
 
 The scan is pattern based (a list of common active ingredients, formulation codes, generic
 class words and dose units). It lowers the risk, it cannot prove a model never names a
@@ -51,12 +53,34 @@ def has_chemical_advice(text: str) -> bool:
     return bool(_ING.search(text) or _FORMULATION.search(text) or _DOSE.search(text) or _PER.search(text))
 
 
+# Practices the app does not give as advice, because no source in the knowledge base backs them
+# for the user's place: burning crop residue (restricted in parts of India) and invented spray or
+# treatment schedules. Dropped like chemical advice, in the text and in the voice script.
+_BURN = re.compile(r"\b(burn|burns|burnt|burned|burning|incinerat\w*)\b", re.I)
+_SCHEDULE = re.compile(
+    r"\b(every|each)\s+\d+(\s*-\s*\d+)?\s*(hours?|days?|weeks?|months?)\b"
+    r"|\b(daily|weekly|fortnightly)\b"
+    r"|\b(once|twice|thrice)\s+(a|per|every|each)\s+(day|week|month)\b"
+    r"|\b\d+\s*times\s+(a|per|every|each)\b"
+    r"|\bat\s+\d+(\s*-\s*\d+)?\s*-?\s*(day|week)\s+intervals?\b",
+    re.I,
+)
+
+
+def has_unsupported_practice(text: str) -> bool:
+    return bool(_BURN.search(text) or _SCHEDULE.search(text))
+
+
+def _blocked(text: str) -> bool:
+    return has_chemical_advice(text) or has_unsupported_practice(text)
+
+
 def clean_text(text: str, fallback: str = "") -> Tuple[str, bool]:
     """Drop sentences that carry chemical advice. Returns (text, was_changed)."""
     if not isinstance(text, str) or not text:
         return text, False
     parts = re.split(r"(?<=[.!?\n])\s+", text)
-    kept = [p for p in parts if not has_chemical_advice(p)]
+    kept = [p for p in parts if not _blocked(p)]
     changed = len(kept) != len(parts)
     out = " ".join(kept).strip()
     if not out:
@@ -65,7 +89,7 @@ def clean_text(text: str, fallback: str = "") -> Tuple[str, bool]:
 
 
 def clean_list(items: List[str]) -> Tuple[List[str], bool]:
-    kept = [i for i in items if isinstance(i, str) and not has_chemical_advice(i)]
+    kept = [i for i in items if isinstance(i, str) and not _blocked(i)]
     return kept, len(kept) != len(items)
 
 

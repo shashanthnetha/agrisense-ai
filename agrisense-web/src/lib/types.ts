@@ -30,6 +30,8 @@ export interface ScanResponse {
   analysis: Analysis;
   treatment: Treatment | null;
   treatment_message?: string;
+  /** 'none' = the knowledge base had no entry for these symptoms. Absent on older servers. */
+  knowledge_match?: 'found' | 'none';
   voice_data: string | null; // base64 string
 }
 

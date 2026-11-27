@@ -1,0 +1,63 @@
+{
+ "note": "Synthetic, author-written symptom lists in everyday wording (not copied from diseases.json). They are NOT labelled field photos or model output. Calibration and test use different diseases. Indicative only; sets are small.",
+ "calibration": {
+  "in_kb": [
+   {"crop":"Rice","kb_id":0,"symptoms":["eye shaped spots with grey middle and brown edge on leaf","spots also on the neck of the panicle"]},
+   {"crop":"Wheat","kb_id":1,"symptoms":["orange powder rubs off on fingers from leaf","later black streaks on stem"]},
+   {"crop":"Tomato","kb_id":2,"symptoms":["large greasy dark patches on leaves spreading quickly","white mould on underside in damp weather"]},
+   {"crop":"Potato","kb_id":5,"symptoms":["brown round spots with rings like a target on lower leaves"]},
+   {"crop":"Mango","kb_id":7,"symptoms":["black sunken patches on young leaves and fruit","young leaves shrivel and fall"]},
+   {"crop":"Chili","kb_id":9,"symptoms":["leaves roll upward and become thick and brittle","plant is small with very few fruits"]},
+   {"crop":"Citrus","kb_id":11,"symptoms":["rough raised corky brown spots with yellow ring on leaf and fruit"]},
+   {"crop":"Grapes","kb_id":13,"symptoms":["yellow oily patches on top of leaf","white cotton like mould underneath"]},
+   {"crop":"Onion","kb_id":14,"symptoms":["small sunken spots turning purple with yellow edge","leaf snaps and falls over"]},
+   {"crop":"Apple","kb_id":15,"symptoms":["dark olive velvety spots on leaves","fruit skin cracks and is misshapen"]},
+   {"crop":"Okra","kb_id":19,"symptoms":["veins are bright yellow while the leaf between stays green","fruit is small and pale"]},
+   {"crop":"Cabbage","kb_id":23,"symptoms":["yellow V shaped wedge from the leaf edge","veins inside the wedge turn black"]},
+   {"crop":"Pea","kb_id":27,"symptoms":["white flour like coating on leaves and pods"]},
+   {"crop":"Rice","kb_id":37,"symptoms":["pale yellow wavy stripes from leaf tip along the edge","sticky bead like drops on lesion in morning"]},
+   {"crop":"Tea","kb_id":46,"symptoms":["translucent pale spots on young leaves that swell into blisters","whitish velvet on the blister underside"]},
+   {"crop":"Banana","kb_id":8,"symptoms":["dots and dashes along the leaf veins","new leaves narrow and standing upright in a bunch"]}
+  ],
+  "out_of_kb": [
+   {"crop":"Rice","symptoms":["oval greenish grey patches on the leaf sheath near water line","lesions join to form a snake skin pattern"]},
+   {"crop":"Tomato","symptoms":["small curled yellow leaves","plant is bushy and stunted with few fruits"]},
+   {"crop":"Potato","symptoms":["leaf edges are brown and dry","older leaves bronzed after a hot dry week"]},
+   {"crop":"Wheat","symptoms":["white powdery patches on lower leaves","leaves dry from the base"]},
+   {"crop":"Mango","symptoms":["white powder on flower panicles","flowers drop without setting fruit"]},
+   {"crop":"Chili","symptoms":["leaves yellow between the veins","new growth is pale"]},
+   {"crop":"Cabbage","symptoms":["holes chewed in leaves","green caterpillars on underside"]},
+   {"crop":"Grapes","symptoms":["brown dry edges on leaves","shoots look burnt after strong sun"]}
+  ]
+ },
+ "test": {
+  "in_kb": [
+   {"crop":"Maize","kb_id":4,"symptoms":["pale green yellow stripes along the leaf","white fuzzy growth on both sides of the leaf","plant is short"]},
+   {"crop":"Groundnut","kb_id":10,"symptoms":["round dark brown spots each with a yellow ring","leaves drop early late in the season"]},
+   {"crop":"Papaya","kb_id":16,"symptoms":["leaf yellowing with patchy mottling","dark green streaks on the leaf stalk"]},
+   {"crop":"Soybean","kb_id":17,"symptoms":["small tan to reddish brown spots on the underside of the leaf","leaves drop too early"]},
+   {"crop":"Coffee","kb_id":18,"symptoms":["yellow orange dusty spots under the leaf","leaves fall early"]},
+   {"crop":"Mustard","kb_id":20,"symptoms":["small black round spots with rings on leaves and pods"]},
+   {"crop":"Turmeric","kb_id":21,"symptoms":["oval spots with yellow border","grey thin centre that may tear out"]},
+   {"crop":"Brinjal","kb_id":22,"symptoms":["round brown spots on leaves","dark sunken patches on the fruit and then soft rot"]},
+   {"crop":"Tobacco","kb_id":25,"symptoms":["light and dark green patchwork on leaf","leaf is twisted and plant is short"]},
+   {"crop":"Cucumber","kb_id":34,"symptoms":["light and dark green mosaic","leaves small and crinkled"]},
+   {"crop":"Cotton","kb_id":39,"symptoms":["angular water soaked spots limited by veins","black streaks on the stem"]},
+   {"crop":"Citrus","kb_id":41,"symptoms":["blotchy yellow mottling on leaves","fruits are small lopsided and stay green at the base"]},
+   {"crop":"Sunflower","kb_id":28,"symptoms":["plant stunted with yellowing along the veins","white fungal growth under the leaf"]},
+   {"crop":"Coffee","kb_id":48,"symptoms":["dark sunken spots on green berries","berries shrivel black and drop"]},
+   {"crop":"Tea","kb_id":46,"symptoms":["pale see through spots on young leaves that become raised blisters"]},
+   {"crop":"Mango","kb_id":42,"symptoms":["shoots form a dense broom like bunch","flower clusters are thick and fail to set fruit"]}
+  ],
+  "out_of_kb": [
+   {"crop":"Rice","symptoms":["boat shaped brown lesions on leaves","leaf tips dry out","plant has an orange tinge"]},
+   {"crop":"Tomato","symptoms":["small dark spots with yellow halo on leaf","fruit has a leathery black patch at the flower end"]},
+   {"crop":"Potato","symptoms":["plant wilts in the afternoon","stem base brown and rotten"]},
+   {"crop":"Wheat","symptoms":["ears are bleached and papery","grains are shrivelled"]},
+   {"crop":"Mango","symptoms":["gall like swellings on leaf surface","leaf is crumpled"]},
+   {"crop":"Chili","symptoms":["white thread like mould at stem base","plant collapses"]},
+   {"crop":"Grapes","symptoms":["tiny red spiders and bronzing on leaf underside","leaf has fine webbing"]},
+   {"crop":"Cabbage","symptoms":["leaf edges burnt and papery after heavy fertilizer","plant growth is slow"]}
+  ]
+ }
+}

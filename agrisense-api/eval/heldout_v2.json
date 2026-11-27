@@ -1,0 +1,53 @@
+{
+ "note": "Frozen held-out set v2. Synthetic, author-written, written once before any scoring; never used to pick or change the threshold or the query template. The earlier 'test' split in queries.json has been seen and must not be reused as held-out evidence. Small and synthetic: indicative only, no real photos or model output.",
+ "in_kb_confusable": [
+  {"crop":"Rice","kb_id":37,"symptoms":["yellowish streaks along leaf edge starting at the tip","dried leaf looks scorched"]},
+  {"crop":"Rice","kb_id":0,"symptoms":["spindle shaped lesion with a pale centre on the leaf blade"]},
+  {"crop":"Wheat","kb_id":1,"symptoms":["rusty orange pustules in rows on the leaf blade"]},
+  {"crop":"Wheat","kb_id":36,"symptoms":["ear heads appear early and the grains are a black dusty mass"]},
+  {"crop":"Potato","kb_id":5,"symptoms":["dark spots with concentric rings on older leaves","leaf yellows around the spot"]},
+  {"crop":"Potato","kb_id":40,"symptoms":["tubers turn wet and mushy with a bad smell"]},
+  {"crop":"Citrus","kb_id":11,"symptoms":["raised rough spots with an oily yellow ring on leaves and fruit rind"]},
+  {"crop":"Citrus","kb_id":41,"symptoms":["asymmetric blotchy yellowing on leaf","small hard lopsided fruit"]},
+  {"crop":"Mango","kb_id":7,"symptoms":["black sunken lesions on fruit and on young leaves"]},
+  {"crop":"Mango","kb_id":42,"symptoms":["flower panicle is stunted and clustered like a broom"]},
+  {"crop":"Banana","kb_id":8,"symptoms":["upright narrow bunched new leaves","dark dashes on the veins"]},
+  {"crop":"Banana","kb_id":43,"symptoms":["older leaves yellow from the margin","stem splits at the base with reddish brown inside"]},
+  {"crop":"Coconut","kb_id":24,"symptoms":["leaflets droop and older fronds yellow at the edges"]},
+  {"crop":"Coconut","kb_id":44,"symptoms":["youngest central leaf yellows then dries and falls","crown smells rotten"]},
+  {"crop":"Chili","kb_id":9,"symptoms":["upward rolled thickened leaves and stunted plant"]},
+  {"crop":"Chili","kb_id":35,"symptoms":["round black sunken spots with rings on the pods","pods shrivel dry"]},
+  {"crop":"Cotton","kb_id":39,"symptoms":["angular watery leaf spots","blackened stem section"]},
+  {"crop":"Groundnut","kb_id":38,"symptoms":["dead rings on young leaves","growing tip dies and plant is dwarfed"]},
+  {"crop":"Sugarcane","kb_id":45,"symptoms":["black whip like shoot coming out of the top"]},
+  {"crop":"Sugarcane","kb_id":6,"symptoms":["inside of the cane is red with white bands","top leaves wither"]}
+ ],
+ "in_kb_crop_unknown": [
+  {"crop":"Unknown","kb_id":13,"symptoms":["yellow oil spots on the upper surface","white cotton growth under the leaf","grape vine"]},
+  {"crop":"Unknown","kb_id":23,"symptoms":["V shaped yellow wedge with black veins from leaf margin"]},
+  {"crop":"Unknown","kb_id":27,"symptoms":["white powder coating on leaves and pods"]},
+  {"crop":"Unknown","kb_id":19,"symptoms":["leaf veins turn yellow while the rest stays green"]},
+  {"crop":"Unknown","kb_id":14,"symptoms":["purple sunken spots with yellow edge on onion leaves"]},
+  {"crop":"Unknown","kb_id":15,"symptoms":["olive velvety spots on leaves and cracked fruit"]},
+  {"crop":"Unknown","kb_id":46,"symptoms":["pale translucent spots swelling to blisters on young tea shoots"]},
+  {"crop":"Unknown","kb_id":47,"symptoms":["leaves yellow and wilt","branches die back and shed leaves"]}
+ ],
+ "out_of_kb_same_crop_lookalike": [
+  {"crop":"Rice","symptoms":["oval grey green patches on leaf sheath near the water","lesions merge and climb the tiller"]},
+  {"crop":"Tomato","symptoms":["brown spots with concentric rings on older leaves"]},
+  {"crop":"Potato","symptoms":["water soaked dark patches on leaves","white mould on the underside in cool wet weather"]},
+  {"crop":"Wheat","symptoms":["white powder patches on leaves and stems"]},
+  {"crop":"Mango","symptoms":["white powder on flower panicles","flowers fall without setting fruit"]},
+  {"crop":"Chili","symptoms":["leaves yellowish green mottled and distorted, plant small"]},
+  {"crop":"Citrus","symptoms":["black sooty coating on leaves","sticky honeydew and small insects"]},
+  {"crop":"Banana","symptoms":["reddish brown elongated streaks on leaves that merge into dead patches"]},
+  {"crop":"Cotton","symptoms":["leaves curl upward with thickened veins","plant stunted"]},
+  {"crop":"Coconut","symptoms":["spiral whitish patches on the underside of leaflets"]}
+ ],
+ "out_of_kb_wrong_or_missing_crop": [
+  {"crop":"Sorghum","symptoms":["elongated straw coloured lesions with dark border on leaf"]},
+  {"crop":"Unknown","symptoms":["leaves yellow between veins","new growth pale"]},
+  {"crop":"Unknown","symptoms":["holes chewed in leaves and green caterpillars"]},
+  {"crop":"Barley","symptoms":["brown net like blotches on leaf"]}
+ ]
+}

@@ -1,169 +1,110 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Camera, ShieldCheck, Zap, Globe, Leaf, UserCheck, Sprout } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { Wordmark } from "@/components/site/Wordmark";
+import { LeafPlate } from "@/components/site/LeafPlate";
+
+const STEPS = [
+  { n: "01", title: "Photograph", body: "One affected leaf, in daylight, filling most of the frame." },
+  { n: "02", title: "Read", body: "The photo is read for crop, visible symptoms and how much of the leaf is affected." },
+  { n: "03", title: "Report", body: "A short report with the likely disease, what to do first, organic steps and prevention." },
+  { n: "04", title: "Listen", body: "The report is read aloud in English, Hindi, Tamil or Telugu." },
+];
+
+const LIMITS = [
+  ["No pesticide products or doses", "The report does not name chemicals or rates. Ask a local agriculture officer before you spray."],
+  ["The confidence figure is the model's own", "It is a self-reported estimate for one photo. It has not been tested against a labelled set of leaves."],
+  ["No recovery forecast", "Nothing in the report predicts how long a crop will take to recover."],
+  ["Limited coverage", "Guidance comes from a knowledge base of 50 diseases and pests, so some problems are not covered yet."],
+];
 
 export default function LandingPage() {
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* Navigation */}
-      <header className="px-4 lg:px-6 h-16 flex items-center border-b bg-white sticky top-0 z-50">
-        <Link className="flex items-center justify-center gap-2" href="#">
-          <Sprout className="h-6 w-6 text-primary" />
-          <span className="text-xl font-bold text-primary whitespace-nowrap">AgriSense AI</span>
-        </Link>
-        <nav className="ml-auto flex gap-4 sm:gap-6">
-          <Link className="hidden sm:inline text-sm font-medium hover:underline underline-offset-4" href="#features">
-            Features
-          </Link>
-          <Link className="hidden sm:inline text-sm whitespace-nowrap font-medium hover:underline underline-offset-4" href="#how-it-works">
-            How it Works
-          </Link>
-          <Link href="/scan">
-            <Button size="sm">Get Started</Button>
+    <div className="min-h-screen">
+      <header className="mx-auto flex h-16 max-w-[1200px] items-center justify-between px-6">
+        <Wordmark />
+        <nav className="flex items-center gap-6 text-[14px]" aria-label="Main">
+          <Link href="#how" className="hidden text-ink-2 transition-colors hover:text-ink sm:inline">How it works</Link>
+          <Link href="#limits" className="hidden text-ink-2 transition-colors hover:text-ink sm:inline">What it does not do</Link>
+          <Link href="/scan" className="inline-flex h-9 items-center rounded-lg bg-ink px-4 text-[14px] font-medium text-paper transition-colors hover:bg-ink/85">
+            Scan a leaf
           </Link>
         </nav>
       </header>
 
-      <main className="flex-1">
-        {/* Hero Section */}
-        <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-gradient-to-b from-green-50 to-white">
-          <div className="container px-4 md:px-6 mx-auto">
-            <div className="flex flex-col items-center space-y-4 text-center">
-              <div className="space-y-2">
-                <Badge className="px-3 py-1 mb-4" variant="secondary">
-                  AI-assisted crop check
-                </Badge>
-                <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl/none text-slate-900">
-                  Check Crop Diseases from a <span className="text-primary text-green-700">Single Photo</span>
-                </h1>
-                <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl dark:text-gray-400 mt-4">
-                  AI-powered agricultural expert in your pocket. Identify diseases, get organic treatments, and save your harvest.
-                </p>
-              </div>
-              <div className="flex flex-col gap-2 min-[400px]:flex-row pt-4">
-                <Link href="/scan">
-                  <Button size="lg" className="h-14 px-8 text-lg rounded-full shadow-lg hover:shadow-xl transition-all">
-                    <Camera className="mr-2 h-5 w-5" /> Start Free Scan
-                  </Button>
-                </Link>
-                <Link href="#features">
-                  <Button size="lg" variant="outline" className="h-14 px-8 text-lg rounded-full">
-                    Learn More
-                  </Button>
-                </Link>
-              </div>
-              <div className="pt-8 flex items-center justify-center gap-4 text-sm text-gray-500">
-                <div className="flex items-center gap-1">
-                  <ShieldCheck className="h-4 w-4 text-primary" />
-                  Confidence shown on every result
-                </div>
-                <div className="flex items-center gap-1">
-                  <Globe className="h-4 w-4 text-primary" />
-                  Voice in 4 languages
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Stats Section */}
-        <section className="w-full py-12 border-y bg-white" id="features">
-          <div className="container px-4 md:px-6 mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <Card className="border-none shadow-none bg-transparent">
-                <CardHeader className="flex flex-col items-center text-center">
-                  <div className="p-3 bg-green-100 rounded-2xl mb-2">
-                    <Zap className="h-8 w-8 text-primary" />
-                  </div>
-                  <CardTitle>Photo-based Detection</CardTitle>
-                  <CardDescription>Upload a photo and get an AI-assisted result using Google Gemini.</CardDescription>
-                </CardHeader>
-              </Card>
-              <Card className="border-none shadow-none bg-transparent">
-                <CardHeader className="flex flex-col items-center text-center">
-                  <div className="p-3 bg-green-100 rounded-2xl mb-2">
-                    <Leaf className="h-8 w-8 text-primary" />
-                  </div>
-                  <CardTitle>Organic Treatments</CardTitle>
-                  <CardDescription>Organic and prevention guidance drawn from a 50-disease knowledge base. Chemical advice is not shown until its sources are checked.</CardDescription>
-                </CardHeader>
-              </Card>
-              <Card className="border-none shadow-none bg-transparent">
-                <CardHeader className="flex flex-col items-center text-center">
-                  <div className="p-3 bg-green-100 rounded-2xl mb-2">
-                    <UserCheck className="h-8 w-8 text-primary" />
-                  </div>
-                  <CardTitle>Expert Voice</CardTitle>
-                  <CardDescription>Listen to treatment plans in your local language with ElevenLabs voice.</CardDescription>
-                </CardHeader>
-              </Card>
-            </div>
-          </div>
-        </section>
-
-        {/* How it Works */}
-        <section className="w-full py-20 lg:py-32 bg-slate-50" id="how-it-works">
-          <div className="container px-4 md:px-6 mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">How It Works</h2>
-              <p className="mt-4 text-gray-500 md:text-lg">Simple steps to protect your crops</p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 relative">
-              <div className="flex flex-col items-center text-center z-10">
-                <div className="w-16 h-16 rounded-full bg-primary text-white flex items-center justify-center text-2xl font-bold mb-4 shadow-md">1</div>
-                <h3 className="text-xl font-bold mb-2">Capture</h3>
-                <p className="text-gray-500">Take a clear photo of the affected plant leaf.</p>
-              </div>
-              <div className="flex flex-col items-center text-center z-10">
-                <div className="w-16 h-16 rounded-full bg-primary text-white flex items-center justify-center text-2xl font-bold mb-4 shadow-md">2</div>
-                <h3 className="text-xl font-bold mb-2">Analyze</h3>
-                <p className="text-gray-500">Our AI identifies the disease and its severity.</p>
-              </div>
-              <div className="flex flex-col items-center text-center z-10">
-                <div className="w-16 h-16 rounded-full bg-primary text-white flex items-center justify-center text-2xl font-bold mb-4 shadow-md">3</div>
-                <h3 className="text-xl font-bold mb-2">Treat</h3>
-                <p className="text-gray-500">Get a step-by-step recovery and treatment plan.</p>
-              </div>
-              <div className="flex flex-col items-center text-center z-10">
-                <div className="w-16 h-16 rounded-full bg-primary text-white flex items-center justify-center text-2xl font-bold mb-4 shadow-md">4</div>
-                <h3 className="text-xl font-bold mb-2">Listen</h3>
-                <p className="text-gray-500">Hear the advice in Hindi, Tamil, Telugu, or 10+ languages.</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* CTA Section */}
-        <section className="w-full py-20 bg-primary">
-          <div className="container px-4 md:px-6 mx-auto">
-            <div className="flex flex-col items-center space-y-4 text-center text-white">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">Ready to protect your harvest?</h2>
-              <p className="mx-auto max-w-[600px] text-green-50 md:text-xl">
-                Join thousands of farmers who are using AgriSense AI to increase their crop yield.
-              </p>
-              <Link href="/scan">
-                <Button size="lg" variant="secondary" className="h-14 px-8 text-lg rounded-full">
-                  Start Your First Scan
-                </Button>
+      <main>
+        <section className="mx-auto grid max-w-[1200px] items-center gap-12 px-6 pb-20 pt-12 lg:min-h-[calc(100vh-64px)] lg:grid-cols-[1.05fr_0.95fr] lg:gap-16 lg:py-12">
+          <div className="rise">
+            <p className="label mb-6">Crop disease check for farmers</p>
+            <h1 className="max-w-[12ch] text-[44px] leading-[1.04] tracking-[-0.02em] sm:text-[56px] lg:text-[68px]">
+              A field report for a sick leaf, from one photo
+            </h1>
+            <p className="mt-6 max-w-[34rem] text-[18px] leading-[28px] text-ink-2">
+              Photograph the affected leaf. AgriSense names the likely disease, lists the symptoms it saw, and reads the organic and prevention steps aloud in your language.
+            </p>
+            <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-4">
+              <Link href="/scan" className="inline-flex h-12 items-center gap-2 rounded-[10px] bg-ink px-6 text-[15px] font-medium text-paper transition-[transform,background-color] duration-150 hover:bg-ink/85 active:scale-[0.98]">
+                Scan a leaf <ArrowRight className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+              </Link>
+              <Link href="#how" className="text-[15px] text-ink underline decoration-line decoration-1 underline-offset-[6px] transition-colors hover:decoration-ink">
+                See how it works
               </Link>
             </div>
           </div>
+          <div className="rise rise-2 mx-auto w-full max-w-[520px] lg:max-w-none">
+            <LeafPlate />
+          </div>
+        </section>
+
+        <section id="how" className="border-t border-line">
+          <div className="reveal mx-auto max-w-[1200px] px-6 py-24">
+            <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr]">
+              <h2 className="max-w-[14ch] text-[36px] leading-[1.1] tracking-[-0.02em] sm:text-[44px]">From the field to a plan in four steps</h2>
+              <ol className="divide-y divide-line border-y border-line">
+                {STEPS.map((s) => (
+                  <li key={s.n} className="grid grid-cols-[48px_1fr] gap-4 py-6 sm:grid-cols-[64px_180px_1fr]">
+                    <span className="label tnum pt-1">{s.n}</span>
+                    <h3 className="text-[22px] leading-[28px]">{s.title}</h3>
+                    <p className="col-span-2 text-[15px] leading-[22px] text-ink-2 sm:col-span-1">{s.body}</p>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </div>
+        </section>
+
+        <section id="limits" className="bg-night text-[#efe9de]">
+          <div className="reveal mx-auto max-w-[1200px] px-6 py-24">
+            <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr]">
+              <div>
+                <h2 className="max-w-[14ch] text-[36px] leading-[1.1] tracking-[-0.02em] sm:text-[44px]">What it does not do</h2>
+                <p className="mt-4 max-w-[28rem] text-[16px] leading-[24px] text-[#a9a194]">
+                  A photo check helps you decide what to look at next. It does not replace someone who can walk your field.
+                </p>
+              </div>
+              <dl className="divide-y divide-white/10 border-y border-white/10">
+                {LIMITS.map(([t, b]) => (
+                  <div key={t} className="grid gap-2 py-6 sm:grid-cols-[260px_1fr] sm:gap-8">
+                    <dt className="text-[17px] leading-[24px]">{t}</dt>
+                    <dd className="text-[15px] leading-[22px] text-[#a9a194]">{b}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          </div>
+        </section>
+
+        <section className="reveal mx-auto flex max-w-[1200px] flex-col items-start justify-between gap-8 px-6 py-24 sm:flex-row sm:items-center">
+          <h2 className="max-w-[18ch] text-[32px] leading-[1.12] tracking-[-0.02em] sm:text-[40px]">Have a leaf in front of you? Start with a photo</h2>
+          <Link href="/scan" className="inline-flex h-12 items-center gap-2 rounded-[10px] bg-ink px-6 text-[15px] font-medium text-paper transition-[transform,background-color] duration-150 hover:bg-ink/85 active:scale-[0.98]">
+            Scan a leaf <ArrowRight className="h-4 w-4" strokeWidth={1.5} aria-hidden />
+          </Link>
         </section>
       </main>
 
-      <footer className="w-full py-6 border-t bg-white">
-        <div className="container px-4 md:px-6 mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="flex items-center gap-2">
-            <Sprout className="h-5 w-5 text-primary" />
-            <span className="font-bold">AgriSense AI</span>
-          </div>
-          <p className="text-sm text-gray-500">© 2026 AgriSense AI. All rights reserved.</p>
-          <nav className="flex gap-4 sm:gap-6">
-            <Link className="text-sm hover:underline underline-offset-4 text-gray-500" href="#">Terms</Link>
-            <Link className="text-sm hover:underline underline-offset-4 text-gray-500" href="#">Privacy</Link>
-          </nav>
+      <footer className="border-t border-line">
+        <div className="mx-auto flex max-w-[1200px] flex-col items-start justify-between gap-4 px-6 py-8 sm:flex-row sm:items-center">
+          <Wordmark />
+          <p className="label">AI-assisted guidance, not a replacement for a local agriculture officer</p>
         </div>
       </footer>
     </div>

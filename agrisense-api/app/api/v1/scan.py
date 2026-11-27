@@ -2,8 +2,8 @@ from fastapi import APIRouter, UploadFile, File, HTTPException, Form, Request
 from typing import Optional
 import base64
 import logging
-from app.services.detection import analyze_image, AnalysisError
-from app.services.rag import query_disease_knowledge
+from app.services.detection import analyze_image, AnalysisError, InvalidImage, validate_image
+from app.services.rag import query_disease_knowledge, NO_MATCH_CONTEXT
 from app.services.treatment import generate_treatment, TreatmentError
 from app.services.voice import generate_voice
 from app.core import limits
@@ -16,6 +16,40 @@ MIN_CONFIDENCE = 50
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
+SUPPORTED_LANGUAGES = {"English", "Hindi", "Tamil", "Telugu"}
+_active_scans = 0  # touched only on the event loop, with no await between check and change
+
+
+class _ScanSlot:
+    """Hold one of MAX_CONCURRENT_SCANS slots, or raise 503 at once instead of queueing."""
+
+    async def __aenter__(self):
+        global _active_scans
+        if _active_scans >= settings.MAX_CONCURRENT_SCANS:
+            raise HTTPException(status_code=503, detail="The service is busy with other scans. Please try again in a minute.")
+        _active_scans += 1
+
+    async def __aexit__(self, *exc):
+        global _active_scans
+        _active_scans -= 1
+
+
+async def _read_limited(upload: UploadFile, limit: int) -> bytes:
+    """Read an upload without ever holding more than limit bytes (+1 chunk) in memory."""
+    chunks, total = [], 0
+    while True:
+        chunk = await upload.read(64 * 1024)
+        if not chunk:
+            break
+        total += len(chunk)
+        if total > limit:
+            raise HTTPException(
+                status_code=413,
+                detail=f"That photo is too large. Please use a photo under {settings.MAX_UPLOAD_MB} MB.",
+            )
+        chunks.append(chunk)
+    return b"".join(chunks)
+
 @router.post("/analyze")
 async def analyze_crop(
     request: Request,
@@ -23,13 +57,23 @@ async def analyze_crop(
     language: str = Form("English")
 ):
     limits.require_access(request)
+    if language not in SUPPORTED_LANGUAGES:
+        raise HTTPException(status_code=400, detail="That language is not supported.")
+    # A busy refusal comes before the allowance is counted, so it costs the caller nothing.
+    async with _ScanSlot():
+        return await _analyze(request, image, language)
+
+
+async def _analyze(request: Request, image: UploadFile, language: str):
     limits.check_scan_allowed(request)
     try:
-        contents = await image.read()
-        if len(contents) > settings.MAX_UPLOAD_MB * 1024 * 1024:
+        contents = await _read_limited(image, settings.MAX_UPLOAD_MB * 1024 * 1024)
+        try:
+            validate_image(contents)
+        except InvalidImage:
             raise HTTPException(
-                status_code=413,
-                detail=f"That photo is too large. Please use a photo under {settings.MAX_UPLOAD_MB} MB.",
+                status_code=400,
+                detail="That file is not a readable JPG or PNG photo. Please choose a photo of a leaf.",
             )
         analysis = await analyze_image(contents)
 
@@ -68,8 +112,21 @@ async def analyze_crop(
             
         rag_context = await query_disease_knowledge(
             disease=analysis.get("disease_name"),
-            crop=analysis.get("crop_type")
+            crop=analysis.get("crop_type"),
+            symptoms=analysis.get("visible_symptoms"),
         )
+        if rag_context == NO_MATCH_CONTEXT:
+            # Nothing in the reference notes fits. Do not let the model write a plan from memory
+            # and do not read one aloud: the diagnosis stays a reading to check, not a basis for treatment.
+            return {
+                "status": "disease_detected",
+                "analysis": analysis,
+                "treatment": None,
+                "knowledge_match": "none",
+                "treatment_message": "This problem is not in AgriSense's reference notes, so no treatment advice is given. Please show the leaf to a local agriculture officer.",
+                "voice_data": None,
+            }
+        knowledge_match = "found"
         
         try:
             treatment = await generate_treatment(analysis, rag_context)
@@ -93,6 +150,7 @@ async def analyze_crop(
             "status": "disease_detected",
             "analysis": analysis,
             "treatment": treatment,
+            "knowledge_match": knowledge_match,
             "voice_data": voice_base64
         }
         

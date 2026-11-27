@@ -6,11 +6,11 @@ import logging
 from typing import List, Literal
 import google.generativeai as genai
 from app.core.config import settings
-from PIL import Image
+from PIL import Image, ImageOps
 import io
 from pydantic import BaseModel, Field, StrictBool, ValidationError, model_validator
 
-from app.services.guard import check_input_tokens, log_usage
+from app.services.guard import check_input_tokens, log_usage, run_provider, ProviderBusy
 
 logger = logging.getLogger(__name__)
 
@@ -51,14 +51,46 @@ Return format:
 }
 """
 
+MAX_PIXELS = 40_000_000  # reject decompression bombs before decoding
+MAX_SIDE = 512  # longest side sent to the model (same size budget as before, aspect kept)
+
+
+class InvalidImage(Exception):
+    """The upload is not a readable JPG or PNG photo."""
+
+
+def validate_image(image_bytes: bytes) -> None:
+    """Cheap check before any paid call. Raises InvalidImage."""
+    try:
+        with Image.open(io.BytesIO(image_bytes)) as im:
+            if im.format not in ("JPEG", "PNG"):
+                raise InvalidImage("not JPEG or PNG")
+            w, h = im.size
+            if w < 32 or h < 32 or w * h > MAX_PIXELS:
+                raise InvalidImage("unsupported size")
+            im.verify()
+    except InvalidImage:
+        raise
+    except Exception as e:
+        raise InvalidImage("unreadable image") from e
+
+
+def _upright(image_bytes: bytes) -> np.ndarray:
+    """Decode, apply the camera's EXIF rotation (phone photos), return BGR."""
+    with Image.open(io.BytesIO(image_bytes)) as im:
+        im = ImageOps.exif_transpose(im).convert("RGB")
+        return cv2.cvtColor(np.asarray(im), cv2.COLOR_RGB2BGR)
+
+
 def preprocess_image(image_bytes: bytes):
     try:
-        # Convert bytes to numpy array
-        nparr = np.frombuffer(image_bytes, np.uint8)
-        img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-        
-        # 1. Resize
-        img = cv2.resize(img, (512, 512))
+        img = _upright(image_bytes)
+
+        # 1. Resize, keeping the aspect ratio (a forced square squashes the leaf)
+        h, w = img.shape[:2]
+        scale = MAX_SIDE / max(h, w)
+        if scale < 1:
+            img = cv2.resize(img, (max(1, round(w * scale)), max(1, round(h * scale))), interpolation=cv2.INTER_AREA)
         
         # 2. Denoise (Bilateral Filter)
         img = cv2.bilateralFilter(img, 9, 75, 75)
@@ -147,15 +179,17 @@ async def analyze_image(image_bytes: bytes):
 
     Raises AnalysisError if every attempt fails.
     """
-    processed_bytes = preprocess_image(image_bytes)
+    processed_bytes = await asyncio.to_thread(preprocess_image, image_bytes)
     last_error = None
     for attempt in range(1, MODEL_ATTEMPTS + 1):
         try:
-            text = await asyncio.wait_for(
-                asyncio.to_thread(_call_model, processed_bytes),
-                timeout=MODEL_TIMEOUT_SECONDS + WAIT_GRACE_SECONDS,
+            text = await run_provider(
+                _call_model, processed_bytes, timeout=MODEL_TIMEOUT_SECONDS + WAIT_GRACE_SECONDS,
             )
             return parse_analysis(text)
+        except ProviderBusy as e:
+            logger.error("Detection not started: provider calls still running")
+            raise AnalysisError("Service is busy") from e
         except asyncio.TimeoutError as e:
             # The worker thread cannot be cancelled. Do not start another call
             # while it may still be running: stop here instead of piling up threads.

@@ -161,6 +161,8 @@ ELEVENLABS_API_KEY=your_elevenlabs_api_key
 # Paid endpoints (/scan/analyze, /voice/generate) are CLOSED unless this is set;
 # callers must send it in the X-Access-Key header (the scan page has a field for it).
 ACCESS_KEY=choose_a_long_random_value
+# Paid calls stay refused unless this is true as well (default: off)
+GENERATION_ENABLED=false
 # Optional usage limits (in-memory, reset on restart; not billing-grade):
 # SCANS_PER_IP_PER_HOUR=5  DAILY_SCAN_CAP=100  MONTHLY_VOICE_CAP=15  MAX_UPLOAD_MB=8
 ```

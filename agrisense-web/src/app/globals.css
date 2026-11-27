@@ -1,35 +1,60 @@
 @import "tailwindcss";
 
+/* Field-notebook palette. One warm neutral ramp, one accent (madder), moss only for "healthy". */
 @theme {
-  --color-primary: #15803d;
-  --color-primary-foreground: #ffffff;
-  --color-background: #ffffff;
-  --color-foreground: #0f172a;
-  --color-border: #e2e8f0;
-  --color-input: #e2e8f0;
-  --color-ring: #15803d;
-  --color-muted: #f1f5f9;
-  --color-muted-foreground: #64748b;
-  --color-accent: #f1f5f9;
-  --color-accent-foreground: #0f172a;
-  --color-destructive: #dc2626;
+  --color-paper: #f6f2e9;
+  --color-card: #fdfbf7;
+  --color-raised: #ede6d8;
+  --color-ink: #1f1b16;
+  --color-ink-2: #5a5146;
+  --color-ink-3: #6f665a;
+  --color-line: rgb(31 27 22 / 0.12);
+  --color-madder: #a33f28;
+  --color-moss: #3c5a35;
+  --color-night: #191713;
+  --color-night-raised: #24211c;
+
+  --font-sans: var(--font-ui), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-display), ui-serif, Georgia, serif;
+  --font-mono: var(--font-meta), ui-monospace, monospace;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-:root {
-  --background: #ffffff;
-  --foreground: #0f172a;
-}
-
+html { background: var(--color-paper); }
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Visible keyboard focus everywhere. */
-:focus-visible {
-  outline: 2px solid #15803d;
-  outline-offset: 2px;
+h1, h2, h3 { font-family: var(--font-serif); font-weight: 400; }
+
+.tnum { font-variant-numeric: tabular-nums; }
+
+/* Specimen-label meta text: the one repeated detail of the product. */
+.label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--color-ink-3);
+  letter-spacing: 0.01em;
 }
+
+:focus-visible {
+  outline: 2px solid var(--color-madder);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* One entrance on load: short fade and rise. */
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.rise { animation: rise 420ms var(--ease-out) both; }
+.rise-2 { animation-delay: 60ms; }
+.rise-3 { animation-delay: 120ms; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -37,4 +62,28 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* ---- Motion: short, one-shot, explains something. Reduced motion collapses all of it. ---- */
+@keyframes draw { to { stroke-dashoffset: 0; } }
+@keyframes pop { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: none; } }
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes sweep { from { transform: translateY(0); } to { transform: translateY(calc(var(--sweep, 240px))); } }
+
+.plate-draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 800ms var(--ease-out) var(--d, 0ms) forwards; }
+.plate-pop { transform-box: fill-box; transform-origin: center; animation: pop 420ms var(--ease-out) var(--d, 0ms) both; }
+.plate-fade { animation: fade 400ms var(--ease-out) var(--d, 0ms) both; }
+.plate-rise { animation: rise 600ms var(--ease-out) var(--d, 0ms) both; }
+
+/* The scan line shows the photo is being read. It runs only while loading. */
+.scanline { animation: sweep 1.6s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate; }
+
+/* Landing sections ease in as they enter the viewport. Browsers without scroll-driven animation show them at once. */
+@supports (animation-timeline: view()) {
+  .reveal { animation: rise linear both; animation-timeline: view(); animation-range: entry 0% entry 35%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-delay: 0s !important; animation-timeline: auto !important; }
+  .plate-draw { stroke-dashoffset: 0; }
 }

@@ -7,7 +7,10 @@ from app.core import limits
 from app.core.config import settings
 
 KEY = {"X-Access-Key": "test-access-key"}
-IMG = {"image": ("a.jpg", b"123", "image/jpeg")}
+import io as _io
+from PIL import Image as _Im
+_b = _io.BytesIO(); _Im.new("RGB", (64, 48)).save(_b, "PNG"); _PNG = _b.getvalue()
+IMG = {"image": ("a.png", _PNG, "image/png")}
 
 
 def scan_client():
@@ -96,3 +99,14 @@ def test_monthly_voice_cap_on_voice_route(monkeypatch):
     c = voice_client()
     codes = [c.post("/voice/generate", json=body, headers=KEY).status_code for _ in range(2)]
     assert codes == [200, 429] and len(called) == 1
+
+
+def test_generation_switch_off_refuses_even_with_a_valid_key(monkeypatch):
+    monkeypatch.setattr(settings, "GENERATION_ENABLED", False)
+    r = scan_client().post("/scan/analyze", files=IMG, headers=KEY)
+    assert r.status_code == 503
+
+
+def test_generation_switch_defaults_to_off():
+    from app.core.config import Settings
+    assert Settings.model_fields["GENERATION_ENABLED"].default is False
