@@ -9,6 +9,7 @@ for key in [
 ]:
     os.environ.setdefault(key, "test")
 os.environ.setdefault("ACCESS_KEY", "test-access-key")
+os.environ.setdefault("GENERATION_ENABLED", "true")
 
 # Replace the ElevenLabs voice service with a stub so the scan route can be tested
 # without that package or any network access. The real treatment module is imported
