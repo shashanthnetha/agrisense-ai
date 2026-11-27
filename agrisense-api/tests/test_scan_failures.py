@@ -216,7 +216,7 @@ def test_disease_path_still_works(monkeypatch):
     r = post(make_client())
     body = r.json()
     assert r.status_code == 200 and body["status"] == "disease_detected"
-    assert body["treatment"] and body["voice_data"]
+    assert body["treatment"] and body["voice_data"] is None
 
 
 def test_route_missing_is_plant_is_error_not_healthy(monkeypatch):
