@@ -23,6 +23,11 @@ GOOD = {
 SECRET = "SECRET-INTERNAL-DETAIL"
 
 
+import io as _io
+from PIL import Image as _Im
+_b = _io.BytesIO(); _Im.new("RGB", (64, 48)).save(_b, "PNG"); _PNG = _b.getvalue()
+
+
 def client():
     app = FastAPI()
     app.include_router(scan.router, prefix="/scan")
@@ -30,13 +35,13 @@ def client():
 
 
 def post(c):
-    return c.post("/scan/analyze", files={"image": ("a.jpg", b"123", "image/jpeg")},
+    return c.post("/scan/analyze", files={"image": ("a.png", _PNG, "image/png")},
                   headers={"X-Access-Key": "test-access-key"})
 
 
 @pytest.fixture(autouse=True)
 def _stubs(monkeypatch):
-    async def rag(disease=None, crop=None):
+    async def rag(disease=None, crop=None, **kw):
         return "ctx"
 
     async def ok(_):
