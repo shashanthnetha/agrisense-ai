@@ -1,4 +1,5 @@
 import asyncio
+from collections import OrderedDict
 import logging
 import re
 import google.generativeai as genai
@@ -61,23 +62,56 @@ def _speak(script: str, language: str) -> bytes:
     return b"".join(audio)
 
 
-async def generate_voice(analysis: dict, treatment: dict, language: str = "English"):
-    try:
-        # The spoken report is composed here from bounded fields only. Free text from the
-        # caller or the model (treatment steps, timelines) is never read aloud.
-        script = (
+# Small in-process cache and in-flight table, keyed by the spoken script and language.
+# The script is built only from bounded fields, so equal keys always mean equal audio.
+_CACHE_MAX = 32
+_cache: "OrderedDict[tuple, bytes]" = OrderedDict()
+_inflight: dict = {}
+
+
+def _compose(analysis: dict) -> str:
+    # The spoken report is composed from bounded fields only. Free text from the
+    # caller or the model (treatment steps, timelines) is never read aloud.
+    return (
             "AgriSense AI crop health report. "
             f"Crop: {_label(analysis.get('crop_type'), 'not identified')}. "
             f"Possible issue: {_label(analysis.get('disease_name'), 'not identified')}. "
             f"Urgency: {_urgency(analysis.get('urgency'))}. "
             "This is an automated estimate from one photo. "
             "Please confirm with a local agriculture officer before taking any action."
-        )
+    )
 
+
+def cached_voice(analysis: dict, language: str):
+    """Audio already made for this exact report and language, or None. Costs nothing."""
+    try:
+        return _cache.get((_compose(analysis or {}), language))
+    except Exception:
+        return None
+
+
+async def generate_voice(analysis: dict, treatment: dict, language: str = "English"):
+    try:
         if language not in LANGUAGE_NAMES:
             logger.warning("Voice requested for an unsupported language")
             return None
-        return await run_provider(_speak, script, language, timeout=settings.VOICE_TIMEOUT_SECONDS + 5)
+        script = _compose(analysis or {})
+        key = (script, language)
+        if key in _cache:
+            _cache.move_to_end(key)
+            return _cache[key]
+        # A second identical request while the first is running waits for it: one provider call.
+        task = _inflight.get(key)
+        if task is None:
+            task = asyncio.ensure_future(run_provider(_speak, script, language, timeout=settings.VOICE_TIMEOUT_SECONDS + 5))
+            _inflight[key] = task
+            task.add_done_callback(lambda _t, k=key: _inflight.pop(k, None))
+        audio = await asyncio.shield(task)
+        if audio:
+            _cache[key] = audio
+            while len(_cache) > _CACHE_MAX:
+                _cache.popitem(last=False)
+        return audio
 
     except Exception as e:
         logger.error("Voice generation error: %s", type(e).__name__)
