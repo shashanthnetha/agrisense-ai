@@ -160,7 +160,6 @@ export default function ScanPage() {
             <div className="space-y-8">
               {result.status === 'disease_detected' && hasPlan && result.treatment && (
                 <VoicePlayer
-                  base64Audio={result.voice_data}
                   analysis={result.analysis}
                   treatment={result.treatment}
                   onLanguageChange={setLanguage}
