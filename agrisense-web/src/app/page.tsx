@@ -7,7 +7,7 @@ const STEPS = [
   { n: "01", title: "Photograph", body: "One affected leaf, in daylight, filling most of the frame." },
   { n: "02", title: "Read", body: "The photo is read for crop, visible symptoms and how much of the leaf is affected." },
   { n: "03", title: "Report", body: "A short report with the likely disease, what to do first, organic steps and prevention." },
-  { n: "04", title: "Listen", body: "The report is read aloud in English, Hindi, Tamil or Telugu." },
+  { n: "04", title: "Listen", body: "When audio is enabled for this demo, the report is read aloud in English, Hindi, Tamil or Telugu." },
 ];
 
 const LIMITS = [
@@ -39,7 +39,7 @@ export default function LandingPage() {
               A field report for a sick leaf, from one photo
             </h1>
             <p className="mt-6 max-w-[34rem] text-[18px] leading-[28px] text-ink-2">
-              Photograph the affected leaf. AgriSense names the likely disease, lists the symptoms it saw, and reads the organic and prevention steps aloud in your language.
+              Photograph the affected leaf. AgriSense names the likely disease, lists the symptoms it saw, and sets out the organic and prevention steps.
             </p>
             <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-4">
               <Link href="/scan" className="inline-flex h-12 items-center gap-2 rounded-[10px] bg-ink px-6 text-[15px] font-medium text-paper transition-[transform,background-color] duration-150 hover:bg-ink/85 active:scale-[0.98]">
