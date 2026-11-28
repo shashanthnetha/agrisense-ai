@@ -71,12 +71,12 @@ export function VoicePlayer({ analysis, treatment, language }: VoicePlayerProps)
   };
 
   return (
-    <section aria-label="Listen to the report" className="flex items-center gap-4 border-b border-line px-5 py-4 sm:px-8">
+    <section aria-label="Listen to the result summary" className="flex items-center gap-4 border-b border-line px-5 py-4 sm:px-8">
       <button
         type="button"
         onClick={listen}
         disabled={isLoading}
-        aria-label={isPlaying ? 'Pause audio' : 'Listen to the report'}
+        aria-label={isPlaying ? 'Pause audio' : 'Listen to the result summary'}
         className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-ink text-paper transition-[transform,background-color] duration-150 hover:bg-ink/85 active:scale-[0.97] disabled:bg-raised disabled:text-ink-3"
       >
         {isLoading ? (
@@ -88,8 +88,8 @@ export function VoicePlayer({ analysis, treatment, language }: VoicePlayerProps)
         )}
       </button>
       <div className="min-w-0 flex-1">
-        <p className="text-[15px] leading-[20px]">Listen to the report in {language}</p>
-        <p className="label">{isPlaying ? 'Playing' : isLoading ? 'Preparing audio' : clip ? 'Ready' : 'Tap to hear it read aloud'}</p>
+        <p className="text-[15px] leading-[20px]">Hear a short summary in {language}</p>
+        <p className="label">{isPlaying ? 'Playing' : isLoading ? 'Preparing audio' : clip ? 'Ready' : 'Tap to hear the result summary'}</p>
       </div>
       {error && (
         <p role="status" className="text-[13px] leading-[20px] text-madder">
