@@ -8,7 +8,7 @@ const ZOOMS = [2, 3, 4];
  * (vertical swipes still scroll the page), or use the arrow keys. It only
  * magnifies. It marks nothing: AgriSense does not locate problems on a leaf.
  */
-export function Loupe({ src, alt, ratio = 1920 / 1285, lens = 176 }: { src: string; alt: string; ratio?: number; lens?: number }) {
+export function Loupe({ src, alt, ratio = 1920 / 1285, lens = 176, dark = false }: { src: string; alt: string; ratio?: number; lens?: number; dark?: boolean }) {
   const box = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ w: 0, h: 0 });
   const [pos, setPos] = useState({ x: 0.82, y: 0.68 });
@@ -43,6 +43,7 @@ export function Loupe({ src, alt, ratio = 1920 / 1285, lens = 176 }: { src: stri
   const ly = pos.y * size.h;
   return (
     <div>
+      <div aria-hidden className={`ruler-x mb-2 ${dark ? "invert" : ""} h-[10px] w-full opacity-70`} />
       <div
         ref={box}
         role="group"
@@ -58,6 +59,9 @@ export function Loupe({ src, alt, ratio = 1920 / 1285, lens = 176 }: { src: stri
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={src} alt={alt} draggable={false} className="absolute inset-0 h-full w-full object-cover" />
+        {size.w > 0 && [44, 92, 148].map((x, i) => (
+          <div key={x} aria-hidden className="pointer-events-none absolute left-0 top-0 rounded-full border border-lime transition-opacity" style={{ width: lens + x, height: lens + x, opacity: 0.7 - i * 0.2, transform: `translate(${lx - (lens + x) / 2}px, ${ly - (lens + x) / 2}px)` }} />
+        ))}
         {size.w > 0 && (
           <div
             aria-hidden
@@ -78,10 +82,10 @@ export function Loupe({ src, alt, ratio = 1920 / 1285, lens = 176 }: { src: stri
         )}
       </div>
       <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-        <p className="label !text-ink-3">Sample photo. Move the lens over it. Nothing is marked.</p>
+        <p className={`label ${dark ? "!text-bone/60" : "!text-ink-3"}`} aria-live="off"><span className="tnum">Lens {zoom}x at {Math.round(pos.x * 100)}, {Math.round(pos.y * 100)}</span> · Sample photo. Nothing is marked.</p>
         <div role="group" aria-label="Magnification" className="flex items-center gap-1">
           {ZOOMS.map((z) => (
-            <button key={z} type="button" onClick={() => setZoom(z)} aria-pressed={zoom === z} className={`h-9 min-w-11 rounded-full px-3 font-mono text-[12px] transition-colors ${zoom === z ? 'bg-ink text-sheet' : 'border border-line text-ink-2 hover:bg-raised'}`}>{z}x</button>
+            <button key={z} type="button" onClick={() => setZoom(z)} aria-pressed={zoom === z} className={`h-9 min-w-11 rounded-full px-3 font-mono text-[12px] transition-colors ${zoom === z ? (dark ? 'bg-lime text-night' : 'bg-ink text-sheet') : (dark ? 'border border-bone/30 text-bone/80 hover:bg-bone/10' : 'border border-line text-ink-2 hover:bg-raised')}`}>{z}x</button>
           ))}
         </div>
       </div>

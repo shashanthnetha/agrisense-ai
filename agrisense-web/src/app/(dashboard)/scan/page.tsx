@@ -23,8 +23,8 @@ function PausedPlate({ state }: { state: ScanStatus['state'] }) {
   return (
     <div role="status" className="rounded-[6px] border border-bone/25 bg-bone/[0.04] px-6 py-16 sm:py-20">
       <p className="label">Scanning availability</p>
-      <h2 className="display mt-4 max-w-[16ch] text-[36px] sm:text-[44px]">
-        {state === 'closed' ? <>This demo has <em>closed.</em></> : <>Scanning is <em>paused</em> right now.</>}
+      <h2 className="head mt-4 max-w-[16ch] text-[34px] sm:text-[44px]">
+        {state === 'closed' ? <>This demo has closed.</> : <>Scanning is paused right now.</>}
       </h2>
       <p className="mt-4 max-w-[24rem] text-[15px] leading-[23px] text-bone/75">
         {state === 'closed'
@@ -138,7 +138,7 @@ export default function ScanPage() {
 
   return (
     <div data-scan-page className={'min-h-screen bg-sheet text-ink'}>
-      <SiteHeader />
+      <SiteHeader tone="dark" />
 
       <main id="main" className={result ? 'pb-4' : 'wrap py-8 sm:py-12'}>
         {!result ? (

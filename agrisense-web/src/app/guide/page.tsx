@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { SiteHeader } from '@/components/site/SiteHeader';
 import { SiteFooter } from '@/components/site/SiteFooter';
+import { PageHero } from '@/components/site/PageHero';
 import { PhotoTester } from '@/components/site/PhotoTester';
 
 export const metadata: Metadata = { title: 'Photo guide | AgriSense AI' };
@@ -15,12 +16,11 @@ const STEPS = [
 export default function Guide() {
   return (
     <div className="bg-sheet text-ink">
-      <SiteHeader />
-      <main id="main" className="wrap py-10 sm:py-16">
-        <p className="label !text-signal">Photo guide</p>
-        <h1 className="head page-h1 mt-4 max-w-[20ch]">The photo decides how useful the reading is.</h1>
-        <p className="mt-5 max-w-[40rem] text-[17px] leading-[27px] text-ink-2">Pick a problem to see what it does to the same leaf.</p>
-        <div className="mt-10"><PhotoTester /></div>
+      <SiteHeader tone="dark" />
+      <main id="main">
+        <PageHero label="Photo guide" title="The photo decides how useful the reading is.">Pick a problem to see what it does to the same leaf.</PageHero>
+        <div className="wrap py-10 sm:py-16">
+        <div><PhotoTester /></div>
 
         <h2 className="head page-h2 mt-20">Four steps in the field</h2>
         <ol className="mt-8 divide-y divide-line border-y border-line">
@@ -32,6 +32,7 @@ export default function Guide() {
             </li>
           ))}
         </ol>
+        </div>
       </main>
       <SiteFooter />
     </div>
