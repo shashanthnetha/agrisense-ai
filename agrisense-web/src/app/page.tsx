@@ -7,7 +7,7 @@ const STEPS = [
   { n: "01", title: "Photograph", body: "One affected leaf, in daylight, filling most of the frame." },
   { n: "02", title: "Read", body: "The photo is read for crop, visible symptoms and how much of the leaf is affected." },
   { n: "03", title: "Report", body: "A short report with the likely disease, what to do first, organic steps and prevention." },
-  { n: "04", title: "Listen", body: "When audio is enabled for this demo, the report is read aloud in English, Hindi, Tamil or Telugu." },
+  { n: "04", title: "Listen", body: "When audio is enabled for this demo, a short spoken summary of the result is available in English, Hindi, Tamil or Telugu." },
 ];
 
 const LIMITS = [
