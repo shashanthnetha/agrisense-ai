@@ -157,7 +157,7 @@ export function ImageUploader({ onUpload, isLoading, language, onLanguageChange,
         </p>
         {showLanguage && (
           <label className="flex items-center justify-between gap-3">
-            <span className="label">Voice report language</span>
+            <span className="label">Audio summary language</span>
             <select
               value={language}
               onChange={(e) => onLanguageChange(e.target.value)}
