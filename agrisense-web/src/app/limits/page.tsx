@@ -7,7 +7,7 @@ import { Checklist } from '@/components/site/Checklist';
 export const metadata: Metadata = { title: 'Before you spray | AgriSense AI' };
 
 const DOES = ['Names the disease the photo most resembles, as a tentative reading', 'Lists the symptoms the model says it can see', 'Points you to a local agriculture officer'];
-const DOESNT = ['Give a diagnosis', 'Mark where on the leaf the problem is', 'Prescribe sprays or doses', 'Measure anything: confidence and affected area are the model2019s own estimates'];
+const DOESNT = ['Give a diagnosis', 'Mark where on the leaf the problem is', 'Prescribe sprays or doses', 'Measure anything: confidence and affected area are the model’s own estimates'];
 
 export default function Limits() {
   return (
