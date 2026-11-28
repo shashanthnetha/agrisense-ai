@@ -115,3 +115,9 @@ h1, h2, h3 { font-family: var(--font-serif); font-weight: 400; }
 .nav-link:hover, .nav-link[aria-current="page"] { color: var(--color-ink); }
 .nav-link[aria-current="page"]::after { content: ""; position: absolute; left: 0; right: 0; bottom: 4px; height: 2px; background: var(--color-signal); }
 .no-scrollbar { scrollbar-width: none; } .no-scrollbar::-webkit-scrollbar { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
+}
+.skip-link { position: absolute; left: 12px; top: -48px; z-index: 100; background: var(--color-ink); color: var(--color-sheet); padding: 10px 16px; border-radius: 999px; transition: top .15s; }
+.skip-link:focus { top: 10px; outline-color: var(--color-lime); }

@@ -6,7 +6,7 @@ export default function HistoryPage() {
   return (
     <div className="bg-sheet text-ink">
       <SiteHeader />
-      <main className="wrap py-10 sm:py-16">
+      <main id="main" className="wrap py-10 sm:py-16">
         <p className="label">History</p>
         <h1 className="head page-h1 mt-4">Your scans.</h1>
         <div className="mt-10 rounded-[4px] border border-line px-6 py-14 sm:py-16">

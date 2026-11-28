@@ -9,7 +9,7 @@ export default function Home() {
   return (
     <div className="bg-sheet text-ink">
       <SiteHeader />
-      <main>
+      <main id="main">
         <section className="wrap grid items-center gap-10 py-10 sm:py-14 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16 lg:py-20">
           <div>
             <p className="label !text-signal">Crop leaf check</p>

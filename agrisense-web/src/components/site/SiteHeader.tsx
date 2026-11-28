@@ -13,6 +13,7 @@ export function SiteHeader() {
   const path = usePathname();
   return (
     <header className="border-b border-line bg-sheet">
+      <a href="#main" className="skip-link">Skip to content</a>
       <div className="wrap flex h-16 items-center justify-between gap-4">
         <Wordmark />
         <nav aria-label="Main" className="hidden items-center gap-7 text-[14.5px] sm:flex">

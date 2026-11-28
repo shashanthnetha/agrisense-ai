@@ -140,7 +140,7 @@ export default function ScanPage() {
     <div data-scan-page className={'min-h-screen bg-sheet text-ink'}>
       <SiteHeader />
 
-      <main className={result ? 'pb-24 sm:pb-28' : 'wrap py-8 sm:py-12'}>
+      <main id="main" className={result ? 'pb-4' : 'wrap py-8 sm:py-12'}>
         {!result ? (
           <div className="dark-surface grid gap-10 rounded-[8px] bg-night p-6 text-bone sm:p-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-14 lg:p-14">
             <div>
@@ -207,18 +207,12 @@ export default function ScanPage() {
       {!result && <SiteFooter />}
 
       {result && (
-        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-paper/95 backdrop-blur pb-[env(safe-area-inset-bottom)]">
-          <div className="mx-auto flex max-w-[1320px] items-center justify-between gap-3 px-5 py-2.5 sm:px-10 sm:py-4">
-            <p className="label hidden sm:block">AI-assisted guidance, not a replacement for a local agriculture officer</p>
+        <div className="wrap pb-16 sm:pb-20">
+          <div className="flex flex-col gap-3 border-t border-line pt-8 sm:flex-row sm:items-center sm:justify-between">
+            <p className="label max-w-[42ch]">AI-assisted guidance, not a replacement for a local agriculture officer</p>
             <div className="flex w-full items-center gap-2 sm:w-auto">
-              <Link href="/history" className="inline-flex h-11 shrink-0 items-center justify-center rounded-full border border-line px-5 text-[14px] text-ink transition-colors hover:bg-raised">History</Link>
-              <button
-                type="button"
-                onClick={reset}
-                className="inline-flex h-11 flex-1 items-center justify-center rounded-full bg-ink px-6 text-[14px] font-medium text-bone transition-[transform,background-color] duration-150 hover:bg-ink/85 active:scale-[0.98] sm:flex-none"
-              >
-                Scan another leaf
-              </button>
+              <Link href="/history" className="btn-line shrink-0">History</Link>
+              <button type="button" onClick={reset} className="btn-ink flex-1 justify-center sm:flex-none">Scan another leaf</button>
             </div>
           </div>
         </div>

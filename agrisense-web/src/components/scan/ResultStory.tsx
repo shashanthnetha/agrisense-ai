@@ -52,7 +52,7 @@ export function ResultStory({ analysis, treatment, treatmentMessage, knowledgeMa
   ].filter(Boolean).join('\n');
 
   return (
-    <article aria-label="Field report" className="wrap pb-6 pt-8 sm:pt-12">
+    <article aria-label="Field report" className="wrap pb-10 pt-8 sm:pt-12">
       <p className="label !text-signal">Field report{reportDate ? ` · ${reportDate}` : ''} · from one photo</p>
 
       <div className="mt-5 grid items-start gap-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:gap-14">
@@ -159,7 +159,6 @@ export function ResultStory({ analysis, treatment, treatmentMessage, knowledgeMa
           {audio && <div className="mt-4 border-t border-line pt-4">{audio}</div>}
         </div>
       </section>
-      <p className="label mt-10 sm:hidden">AI-assisted guidance, not a replacement for a local agriculture officer</p>
     </article>
   );
 }

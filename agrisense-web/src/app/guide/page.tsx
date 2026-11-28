@@ -16,7 +16,7 @@ export default function Guide() {
   return (
     <div className="bg-sheet text-ink">
       <SiteHeader />
-      <main className="wrap py-10 sm:py-16">
+      <main id="main" className="wrap py-10 sm:py-16">
         <p className="label !text-signal">Photo guide</p>
         <h1 className="head page-h1 mt-4 max-w-[20ch]">The photo decides how useful the reading is.</h1>
         <p className="mt-5 max-w-[40rem] text-[17px] leading-[27px] text-ink-2">Pick a problem to see what it does to the same leaf.</p>
