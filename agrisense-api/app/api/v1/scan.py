@@ -49,6 +49,32 @@ async def _read_limited(upload: UploadFile, limit: int) -> bytes:
         chunks.append(chunk)
     return b"".join(chunks)
 
+@router.get("/status")
+async def scan_status():
+    """Secret-free service status so the web app can show an honest open/paused state up front.
+
+    No counters, keys or provider details: only what a visitor needs to know before uploading.
+    `open` means an upload can be attempted right now (the scan cap can still refuse it).
+    """
+    if not settings.GENERATION_ENABLED:
+        return {"open": False, "voice_available": False, "access_key_accepted": False, "state": "paused"}
+    if settings.PUBLIC_MODE:
+        window = cap.window_open()
+        return {
+            "open": window,
+            "voice_available": window and settings.PUBLIC_VOICE_ENABLED,
+            "access_key_accepted": False,
+            "state": "open" if window else "closed",
+        }
+    keyed = bool(settings.ACCESS_KEY)
+    return {
+        "open": keyed,
+        "voice_available": keyed,
+        "access_key_accepted": keyed,
+        "state": "key_required" if keyed else "paused",
+    }
+
+
 @router.post("/analyze")
 async def analyze_crop(
     request: Request,
