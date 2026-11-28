@@ -8,7 +8,12 @@ import { toast } from 'sonner';
 interface ImageUploaderProps {
   onUpload: (file: File) => void;
   isLoading: boolean;
+  language: string;
+  onLanguageChange: (lang: string) => void;
+  showLanguage: boolean;
 }
+
+export const LANGUAGES = ['English', 'Hindi', 'Tamil', 'Telugu'];
 
 const MAX_BYTES = 10 * 1024 * 1024;
 const LOADING_STEPS = ['Uploading photo', 'Checking the leaf', 'Preparing your report'];
@@ -33,7 +38,7 @@ function Corners({ active = false }: { active?: boolean }) {
 const primary = 'inline-flex h-12 items-center justify-center gap-2 rounded-[10px] bg-ink px-6 text-[15px] font-medium text-paper transition-[transform,background-color] duration-150 hover:bg-ink/85 active:scale-[0.98] disabled:opacity-50';
 const secondary = 'inline-flex h-12 items-center justify-center gap-2 rounded-[10px] border border-line bg-card px-6 text-[15px] text-ink transition-colors duration-150 hover:bg-raised disabled:opacity-50';
 
-export function ImageUploader({ onUpload, isLoading }: ImageUploaderProps) {
+export function ImageUploader({ onUpload, isLoading, language, onLanguageChange, showLanguage }: ImageUploaderProps) {
   const [preview, setPreview] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [stepIdx, setStepIdx] = useState(0);
@@ -150,6 +155,21 @@ export function ImageUploader({ onUpload, isLoading }: ImageUploaderProps) {
         <p className="label truncate">
           {selectedFile.name} · {formatSize(selectedFile.size)}
         </p>
+        {showLanguage && (
+          <label className="flex items-center justify-between gap-3">
+            <span className="label">Voice report language</span>
+            <select
+              value={language}
+              onChange={(e) => onLanguageChange(e.target.value)}
+              disabled={isLoading}
+              className="h-10 rounded-lg border border-line bg-paper px-3 text-[14px] text-ink"
+            >
+              {LANGUAGES.map((l) => (
+                <option key={l} value={l}>{l}</option>
+              ))}
+            </select>
+          </label>
+        )}
         <div className="flex gap-3">
           <button type="button" className={`${secondary} flex-1`} onClick={clear} disabled={isLoading}>Retake</button>
           <button type="button" className={`${primary} flex-[2]`} onClick={() => onUpload(selectedFile)} disabled={isLoading}>
