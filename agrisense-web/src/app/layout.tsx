@@ -8,7 +8,7 @@ const meta = Geist_Mono({ variable: "--font-meta", subsets: ["latin"], weight: [
 
 export const metadata: Metadata = {
   title: "AgriSense AI | Crop disease check from a photo",
-  description: "Photograph a crop leaf and get an AI-assisted field report with organic and prevention guidance, read aloud in English, Hindi, Tamil or Telugu.",
+  description: "Photograph a crop leaf and get an AI-assisted field report with the likely disease, visible findings and prevention. Treatment is referred to a local agriculture officer for confirmation.",
 };
 
 export const viewport: Viewport = {
