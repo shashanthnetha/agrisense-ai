@@ -61,7 +61,7 @@ export default function Home() {
               <div className="self-end">
                 <p className="label">What a good photo gives it to read</p>
                 <h2 className="head page-h2 mt-3 max-w-[22ch]">Close enough to see the edge of a spot.</h2>
-                <p className="mt-4 max-w-[52ch] text-[16px] leading-[25px] text-bone/75">Four crops of the same sample photo. The reading is only as good as what is sharp in the frame: the rim of a spot, the colour change around it, and normal leaf to compare.</p>
+                <p className="mt-4 max-w-[52ch] text-[16px] leading-[25px] text-bone/75">Four crops of the same sample photo. A photo taken close and in focus shows the rim of a mark and the colour around it. A distant or blurry one does not.</p>
               </div>
             </div>
             <div className="mt-12"><ContactSheet /></div>
@@ -72,7 +72,7 @@ export default function Home() {
           <div className="wrap grid gap-px md:grid-cols-2">
             <Link href="/guide" className="group flex flex-col justify-between gap-10 py-12 sm:py-16 md:pr-12">
               <div><p className="label !text-night/70">Before you scan</p>
-                <h2 className="head page-h2 mt-3">Why most bad readings start with the photo.</h2>
+                <h2 className="head page-h2 mt-3">How the photo changes what can be read.</h2>
                 <p className="mt-3 max-w-[40ch] text-[15px] leading-[23px] text-night/80">Try the five common photo problems on the same leaf and see what each one hides.</p></div>
               <span className="inline-flex items-center gap-2 text-[15px] font-medium">Open the photo guide <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden /></span>
             </Link>

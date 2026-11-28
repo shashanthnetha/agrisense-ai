@@ -18,7 +18,7 @@ export default function Guide() {
     <div className="bg-sheet text-ink">
       <SiteHeader tone="dark" />
       <main id="main">
-        <PageHero label="Photo guide" title="The photo decides how useful the reading is.">Pick a problem to see what it does to the same leaf.</PageHero>
+        <PageHero label="Photo guide" title="A clear photo gives the model more to read.">Pick a problem to see what it does to the same leaf.</PageHero>
         <div className="wrap py-10 sm:py-16">
         <div><PhotoTester /></div>
 

@@ -52,37 +52,39 @@ export function ResultStory({ analysis, treatment, treatmentMessage, knowledgeMa
   ].filter(Boolean).join('\n');
 
   return (
-    <article aria-label="Field report" className="wrap pb-10 pt-8 sm:pt-12">
-      <p className="label !text-signal">Field report{reportDate ? ` · ${reportDate}` : ''} · from one photo</p>
+    <article aria-label="Field report">
+      <section className="dark-surface bg-leaf text-bone">
+      <div className="wrap pb-12 pt-8 sm:pb-16 sm:pt-12">
+      <p className="label !text-lime">Field report{reportDate ? ` · ${reportDate}` : ''} · from one photo</p>
 
       <div className="mt-5 grid items-start gap-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:gap-14">
         <figure>
           <div className="aspect-[4/3] w-full overflow-hidden rounded-[4px] bg-night">
             {photo ? <PhotoLens src={photo} className="h-full w-full" /> : null}
           </div>
-          <figcaption className="label mt-3 !text-ink-3">Your photo, as taken. Nothing is marked.</figcaption>
+          <figcaption className="label mt-3 !text-bone/60">Your photo, as taken. Nothing is marked.</figcaption>
         </figure>
 
         <div className="min-w-0">
-          <p className="text-[17px] italic text-ink-2">{sick ? 'Looks like' : 'What we see'}</p>
+          <p className="text-[17px] italic text-bone/75">{sick ? 'Looks like' : 'What we see'}</p>
           <h1 className="head mt-1 break-words text-[clamp(30px,4.2vw,56px)]">{sick ? analysis.disease_name : 'No disease seen'}</h1>
           <div className="mt-4 flex flex-wrap items-center gap-2 text-[13px]">
-            <span className="rounded-full border border-line px-3 py-1">{analysis.crop_type}</span>
+            <span className="rounded-full border border-bone/30 px-3 py-1">{analysis.crop_type}</span>
             {sick && (
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-line px-3 py-1">
-                <span className="inline-block h-1.5 w-1.5 rounded-full bg-signal" aria-hidden />
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-bone/30 px-3 py-1">
+                <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#ff9a62]" aria-hidden />
                 {analysis.urgency} urgency · AI-assessed
               </span>
             )}
           </div>
-          <p className="mt-4 max-w-[40rem] text-[16px] leading-[24px] text-ink-2">
+          <p className="mt-4 max-w-[40rem] text-[16px] leading-[24px] text-bone/80">
             {sick
               ? 'This is a tentative AI identification from one photo, not a diagnosis. Confirm with a local agriculture officer before spraying.'
               : 'The leaf looks healthy in this photo. Re-scan if symptoms appear.'}
           </p>
 
           {sick && (
-            <section id="what-now" aria-label="What now" className="dark-surface mt-7 rounded-[6px] bg-night p-5 text-bone sm:p-7">
+            <section id="what-now" aria-label="What now" className="dark-surface mt-7 rounded-[6px] bg-night p-5 text-bone sm:p-7 border border-bone/15">
               <p className="label !text-[#ff9a62]">What now</p>
               {noReference ? (
                 <div role="alert" className="mt-3">
@@ -116,8 +118,10 @@ export function ResultStory({ analysis, treatment, treatmentMessage, knowledgeMa
           )}
         </div>
       </div>
-
-      <section aria-label="What the model reported" className="mt-14 grid gap-10 border-t border-line pt-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:gap-14">
+      </div>
+      </section>
+      <div className="wrap pb-10">
+      <section aria-label="What the model reported" className="mt-10 grid gap-10 pt-2 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:gap-14">
         <div>
           <h2 className="head page-h2">What the model reported</h2>
           {symptoms.length > 0 ? (
@@ -159,6 +163,7 @@ export function ResultStory({ analysis, treatment, treatmentMessage, knowledgeMa
           {audio && <div className="mt-4 border-t border-line pt-4">{audio}</div>}
         </div>
       </section>
+    </div>
     </article>
   );
 }

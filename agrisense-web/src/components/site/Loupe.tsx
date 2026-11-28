@@ -11,7 +11,7 @@ const ZOOMS = [2, 3, 4];
 export function Loupe({ src, alt, ratio = 1920 / 1285, lens = 176, dark = false }: { src: string; alt: string; ratio?: number; lens?: number; dark?: boolean }) {
   const box = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ w: 0, h: 0 });
-  const [pos, setPos] = useState({ x: 0.82, y: 0.68 });
+  const [pos, setPos] = useState({ x: 0.3, y: 0.42 });
   const [zoom, setZoom] = useState(3);
   const [active, setActive] = useState(false);
 
@@ -43,7 +43,6 @@ export function Loupe({ src, alt, ratio = 1920 / 1285, lens = 176, dark = false 
   const ly = pos.y * size.h;
   return (
     <div>
-      <div aria-hidden className={`ruler-x mb-2 ${dark ? "invert" : ""} h-[10px] w-full opacity-70`} />
       <div
         ref={box}
         role="group"
@@ -82,7 +81,7 @@ export function Loupe({ src, alt, ratio = 1920 / 1285, lens = 176, dark = false 
         )}
       </div>
       <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-        <p className={`label ${dark ? "!text-bone/60" : "!text-ink-3"}`} aria-live="off"><span className="tnum">Lens {zoom}x at {Math.round(pos.x * 100)}, {Math.round(pos.y * 100)}</span> · Sample photo. Nothing is marked.</p>
+        <p className={`label ${dark ? "!text-bone/60" : "!text-ink-3"}`} aria-live="off">Magnifier only, {zoom}x. Sample photo. Nothing is marked or detected.</p>
         <div role="group" aria-label="Magnification" className="flex items-center gap-1">
           {ZOOMS.map((z) => (
             <button key={z} type="button" onClick={() => setZoom(z)} aria-pressed={zoom === z} className={`h-9 min-w-11 rounded-full px-3 font-mono text-[12px] transition-colors ${zoom === z ? (dark ? 'bg-lime text-night' : 'bg-ink text-sheet') : (dark ? 'border border-bone/30 text-bone/80 hover:bg-bone/10' : 'border border-line text-ink-2 hover:bg-raised')}`}>{z}x</button>

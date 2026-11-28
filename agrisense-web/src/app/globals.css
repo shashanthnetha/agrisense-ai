@@ -10,7 +10,7 @@
   --color-raised: #e1dac2;
   --color-ink: #15201a;
   --color-ink-2: #46523f;
-  --color-ink-3: #6b7762;
+  --color-ink-3: #56624e;
   --color-line: rgb(21 32 26 / 0.2);
   --color-acid: #2c5a31;
   --color-madder: #b4451a;
@@ -21,7 +21,7 @@
   --color-bone: #f1ecd9;
 
   --font-head: var(--font-heading), var(--font-ui), ui-sans-serif, sans-serif;
-  --color-signal: #d9480f;
+  --color-signal: #b23a07;
   --color-field: #2f5d34;
   --color-sheet: #f6f3ea;
   --font-sans: var(--font-ui), ui-sans-serif, system-ui, sans-serif;
