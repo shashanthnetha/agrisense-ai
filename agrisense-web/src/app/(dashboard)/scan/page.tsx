@@ -11,6 +11,7 @@ import { ScanResponse } from '@/lib/types';
 import { toast } from 'sonner';
 import Link from 'next/link';
 import { VolumeX } from 'lucide-react';
+import { treatmentVerified } from '@/lib/advice';
 
 const TIPS = [
   'Use daylight and avoid shadows',
@@ -127,7 +128,8 @@ export default function ScanPage() {
 
   const sick = !!result?.analysis?.disease_detected;
   const reportDate = result ? new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) : null;
-  const leadAction = result?.treatment?.immediate_action?.trim();
+  // Immediate action is treatment advice: only a source-verified record may show it.
+  const leadAction = treatmentVerified(result?.treatment) ? result?.treatment?.immediate_action?.trim() : '';
 
   return (
     <div className="min-h-screen">
