@@ -1,10 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { Instrument_Sans, Newsreader, Geist_Mono } from "next/font/google";
+import { Instrument_Sans, Newsreader, Geist_Mono, Bricolage_Grotesque } from "next/font/google";
 import "./globals.css";
 import { PreviewBanner } from "@/components/site/PreviewBanner";
 
 const ui = Instrument_Sans({ variable: "--font-ui", subsets: ["latin"], weight: ["400", "500"] });
 const display = Newsreader({ variable: "--font-display", subsets: ["latin"], weight: ["300", "400", "500"], style: ["normal", "italic"] });
+const heading = Bricolage_Grotesque({ variable: "--font-heading", subsets: ["latin"], weight: ["500", "600", "700"] });
 const meta = Geist_Mono({ variable: "--font-meta", subsets: ["latin"], weight: ["400"] });
 
 export const metadata: Metadata = {
@@ -24,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${ui.variable} ${display.variable} ${meta.variable}`}>
+    <html lang="en" className={`${ui.variable} ${display.variable} ${meta.variable} ${heading.variable}`}>
       <body>
         <PreviewBanner />
         {children}

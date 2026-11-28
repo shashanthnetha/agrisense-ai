@@ -41,11 +41,7 @@ export function PhotoLens({ src, className = '' }: { src: string; className?: st
         onPointerLeave={() => setLens(null)}
         onClick={() => show()}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        {/* Ambient fill for the dark area under a portrait crop: a blurred copy of the same photo, decorative only. */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={src} alt="" aria-hidden className="absolute inset-0 h-full w-full scale-125 object-cover opacity-70 blur-2xl min-[640px]:hidden" draggable={false} />
-        <img ref={img} src={src} alt="Your leaf photo, shown as taken" className="h-full w-full object-contain object-top min-[640px]:object-cover min-[640px]:object-[60%_40%]" draggable={false} />
+        <img ref={img} src={src} alt="Your leaf photo, shown as taken" className="h-full w-full object-cover object-[60%_40%]" draggable={false} />
         {lens && (
           <span
             aria-hidden
@@ -62,7 +58,7 @@ export function PhotoLens({ src, className = '' }: { src: string; className?: st
         <button
           type="button"
           onClick={(e) => { e.stopPropagation(); show(); }}
-          className="absolute right-3 top-3 sm:right-10 sm:top-11 inline-flex h-11 items-center gap-2 rounded-full bg-night/80 px-4 text-[13px] text-bone backdrop-blur transition-colors hover:bg-night"
+          className="absolute right-3 top-3 inline-flex h-11 items-center gap-2 rounded-full bg-night/80 px-4 text-[13px] text-bone backdrop-blur transition-colors hover:bg-night"
         >
           <Maximize2 className="h-4 w-4" strokeWidth={1.5} aria-hidden /> Inspect full size
         </button>

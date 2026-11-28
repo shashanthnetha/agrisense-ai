@@ -136,8 +136,8 @@ export function ImageUploader({ onUpload, isLoading, language, onLanguageChange,
         <span className="absolute inset-x-[9%] inset-y-[11%] border border-dashed border-bone/25" aria-hidden />
         <span className="label absolute left-[9%] top-[5%]">Daylight</span>
         <span className="label absolute right-[9%] top-[5%]">10 to 15 cm</span>
-        <span className="label absolute bottom-[4%] left-[9%]">One leaf fills the frame</span>
-        <span className="label absolute bottom-[4%] right-[9%]">Hold steady</span>
+        <span className="label absolute bottom-[4%] left-[9%] max-sm:right-[9%] max-sm:text-center">One leaf fills the frame</span>
+        <span className="label absolute bottom-[4%] right-[9%] max-sm:hidden">Hold steady</span>
         <p className="label relative">Step 1 of 2</p>
         <h2 className="mt-3 text-[28px] leading-[32px] tracking-[-0.01em]">Add a photo of the leaf</h2>
         <p className="mx-auto mt-2 max-w-[22rem] text-[15px] leading-[22px] text-bone/75">

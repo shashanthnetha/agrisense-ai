@@ -4,7 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { ImageUploader } from '@/components/scan/ImageUploader';
 import { ResultStory } from '@/components/scan/ResultStory';
 import { VoicePlayer } from '@/components/scan/VoicePlayer';
-import { Wordmark } from '@/components/site/Wordmark';
+import { SiteHeader } from '@/components/site/SiteHeader';
+import { SiteFooter } from '@/components/site/SiteFooter';
 import { analyzeCrop, getScanStatus, ACCESS_KEY_STORAGE, ScanStatus } from '@/lib/api';
 import { ScanResponse } from '@/lib/types';
 import { toast } from 'sonner';
@@ -136,23 +137,15 @@ export default function ScanPage() {
   ) : null;
 
   return (
-    <div data-scan-page className={`min-h-screen ${result ? '' : 'dark-surface bg-night text-bone'}`}>
-      <header className={`mx-auto flex h-16 max-w-[1320px] items-center justify-between px-5 sm:px-10 ${result ? 'hidden' : ''}`}>
-        <Wordmark tone={result ? 'ink' : 'bone'} />
-        <nav aria-label="Main" className="flex items-center gap-6 text-[14px]">
-          <Link href="/history" className="text-bone/70 transition-colors hover:text-bone">History</Link>
-        </nav>
-      </header>
+    <div data-scan-page className={'min-h-screen bg-sheet text-ink'}>
+      <SiteHeader />
 
-      <main className={result ? 'pb-20 sm:pb-24' : 'mx-auto max-w-[1320px] px-6 pb-28 pt-6 sm:px-10'}>
+      <main className={result ? 'pb-24 sm:pb-28' : 'wrap py-8 sm:py-12'}>
         {!result ? (
-          <div className="grid gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16">
+          <div className="dark-surface grid gap-10 rounded-[8px] bg-night p-6 text-bone sm:p-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-14 lg:p-14">
             <div>
               <p className="label rise">New scan</p>
-              <h1 className="display mt-4 text-[56px] sm:text-[88px]">
-                <span className="rv"><span>Scan a</span></span>
-                <span className="rv"><span style={{ '--d': '110ms' } as React.CSSProperties}><em>leaf.</em></span></span>
-              </h1>
+              <h1 className="head page-h1 mt-4">Scan a leaf.</h1>
               <p className="rise mt-5 max-w-[26rem] text-[16px] leading-[25px] text-bone/75" style={{ '--d': '220ms' } as React.CSSProperties}>
                 One photo in, a tentative identification and next steps out. Confirm with a local agriculture officer.
               </p>
@@ -210,6 +203,8 @@ export default function ScanPage() {
           />
         )}
       </main>
+
+      {!result && <SiteFooter />}
 
       {result && (
         <div className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-paper/95 backdrop-blur pb-[env(safe-area-inset-bottom)]">

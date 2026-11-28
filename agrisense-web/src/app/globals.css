@@ -20,6 +20,10 @@
   --color-lime: #d3e873;
   --color-bone: #f1ecd9;
 
+  --font-head: var(--font-heading), var(--font-ui), ui-sans-serif, sans-serif;
+  --color-signal: #d9480f;
+  --color-field: #2f5d34;
+  --color-sheet: #f6f3ea;
   --font-sans: var(--font-ui), ui-sans-serif, system-ui, sans-serif;
   --font-serif: var(--font-display), ui-serif, Georgia, serif;
   --font-mono: var(--font-meta), ui-monospace, monospace;
@@ -95,3 +99,19 @@ h1, h2, h3 { font-family: var(--font-serif); font-weight: 400; }
   .rv > span, .rise, .hero-photo, .sweep, .stage-in, .scroll-rise, .hero-shift, .hero-fade { animation: none !important; transform: none; clip-path: none; opacity: 1; }
   .rv > span { transform: none; }
 }
+
+
+/* ---- Site shell (light "field sheet" pages) ---- */
+.head { font-family: var(--font-head); letter-spacing: -0.025em; line-height: 1.04; font-weight: 600; }
+.page-h1 { font-size: clamp(34px, 4.6vw, 60px); }
+.page-h2 { font-size: clamp(26px, 3vw, 40px); }
+.wrap { width: 100%; max-width: 1240px; margin-inline: auto; padding-inline: clamp(20px, 4vw, 48px); }
+.ruler-x { background-image: repeating-linear-gradient(90deg, rgb(21 32 26 / 0.45) 0 1px, transparent 1px 8px), repeating-linear-gradient(90deg, rgb(21 32 26 / 0.75) 0 1px, transparent 1px 40px); background-size: 100% 5px, 100% 10px; background-repeat: no-repeat; background-position: 0 0, 0 0; }
+.btn-ink { display: inline-flex; align-items: center; gap: .6rem; min-height: 44px; padding: 0 1.4rem; border-radius: 999px; background: var(--color-ink); color: var(--color-sheet); font-weight: 500; transition: transform .15s var(--ease-out), background-color .2s; touch-action: manipulation; }
+.btn-ink:hover { background: #000; } .btn-ink:active { transform: scale(.98); }
+.btn-line { display: inline-flex; align-items: center; gap: .5rem; min-height: 44px; padding: 0 1.2rem; border-radius: 999px; border: 1px solid var(--color-line); color: var(--color-ink); touch-action: manipulation; transition: background-color .2s; }
+.btn-line:hover { background: var(--color-raised); }
+.nav-link { position: relative; padding: 10px 2px; color: var(--color-ink-2); }
+.nav-link:hover, .nav-link[aria-current="page"] { color: var(--color-ink); }
+.nav-link[aria-current="page"]::after { content: ""; position: absolute; left: 0; right: 0; bottom: 4px; height: 2px; background: var(--color-signal); }
+.no-scrollbar { scrollbar-width: none; } .no-scrollbar::-webkit-scrollbar { display: none; }
