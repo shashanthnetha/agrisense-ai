@@ -21,19 +21,18 @@ function Entry({ n, title, children }: { n: string; title: string; children: Rea
   );
 }
 
+/* Entry 01 ("Do this first") is rendered by the report page itself as the lead. */
 export function TreatmentPlan({ treatment }: TreatmentPlanProps) {
   const org = treatment.organic_treatment;
-  const action = safeText(treatment.immediate_action) || 'Ask a local agriculture officer what to do for this crop.';
   const method = safeText(org.method) || 'Ask a local agriculture officer about organic options for this crop.';
-  const materials = safeList(org.materials);
+  const dosage = safeText(org.dosage);
   const tips = safeList(treatment.prevention_tips);
   const warning = safeText(treatment.warning_signs);
+  // Materials without a verified dose are not a recipe: never list them on their own.
+  const showMaterials = safeList(org.materials).length > 0 && !!dosage && !/not shown/i.test(dosage);
+  const materials = showMaterials ? safeList(org.materials) : [];
   return (
     <div aria-label="Treatment plan" className="rise rise-2">
-      <Entry n="01" title="Do this first">
-        <p className="text-[17px] leading-[26px]">{action}</p>
-      </Entry>
-
       <Entry n="02" title="Organic treatment">
         <p className="text-[15px] leading-[24px] text-ink-2">{method}</p>
         {materials.length > 0 && (
@@ -46,10 +45,10 @@ export function TreatmentPlan({ treatment }: TreatmentPlanProps) {
             </ul>
           </div>
         )}
-        {org.dosage && (
+        {dosage && (
           <div className="mt-4">
             <p className="label">How much</p>
-            <p className="mt-1 text-[15px] leading-[24px] text-ink-2">{org.dosage}</p>
+            <p className="mt-1 text-[15px] leading-[24px] text-ink-2">{dosage}</p>
           </div>
         )}
       </Entry>
