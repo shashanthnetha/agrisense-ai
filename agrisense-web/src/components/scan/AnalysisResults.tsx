@@ -2,80 +2,57 @@
 
 import React from 'react';
 import { Analysis } from '@/lib/types';
-import { CountUp } from './CountUp';
 
 interface AnalysisResultsProps {
   analysis: Analysis;
   photo?: string | null;
 }
 
-/* Urgency is text plus a dot, never a coloured pill. Colour only for meaning. */
-const URGENCY_DOT: Record<string, string> = {
-  Low: 'bg-moss',
-  Medium: 'bg-[#7a5200]',
-  High: 'bg-madder',
-  Critical: 'bg-madder',
-};
-
+/* The evidence strip: the photo as a small specimen thumb, with the two figures beside it.
+   Progressive detail ("Why this result") stays collapsed below. */
 export function AnalysisResults({ analysis, photo }: AnalysisResultsProps) {
   const sick = analysis.disease_detected;
   const symptoms: string[] = analysis.visible_symptoms || [];
 
+  const cols = photo
+    ? sick
+      ? 'grid-cols-[112px_1fr_1fr] sm:grid-cols-[144px_1fr_1fr]'
+      : 'grid-cols-[112px_1fr] sm:grid-cols-[144px_1fr]'
+    : sick
+      ? 'grid-cols-2'
+      : 'grid-cols-1';
+
   return (
-    <section aria-labelledby="diagnosis-heading" className="rise">
-      <div className="overflow-hidden rounded-2xl border border-line bg-card">
+    <div>
+      <dl className={`grid border-b border-line ${cols}`}>
         {photo && (
-          <div className="relative aspect-[4/3] bg-raised">
+          <div className="relative aspect-square bg-raised">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={photo} alt="Your leaf photo" className="h-full w-full object-cover" />
+            <p className="label absolute bottom-1.5 left-1.5 rounded bg-night/70 px-1.5 py-0.5 !text-[10px] !text-paper/90">Plate 01</p>
           </div>
         )}
-        <div className="p-5">
-          <p className="label">
-            {analysis.crop_type}
-            {sick && (
-              <>
-                {' · '}
-                <span className="inline-flex items-center gap-1.5 text-ink-2">
-                  <span className={`inline-block h-1.5 w-1.5 rounded-full ${URGENCY_DOT[analysis.urgency] ?? URGENCY_DOT.Medium}`} aria-hidden />
-                  {analysis.urgency} urgency
-                </span>
-              </>
-            )}
-          </p>
-          <h2 id="diagnosis-heading" className="mt-2 text-[32px] leading-[36px] tracking-[-0.02em]">
-            {sick ? analysis.disease_name : 'No disease found'}
-          </h2>
-          <p className="mt-3 text-[14px] leading-[20px] text-ink-2">
-            {sick
-              ? 'This is an AI estimate from one photo. Confirm with a local agriculture officer before spraying.'
-              : 'The leaf looks healthy in this photo. Re-scan if symptoms appear.'}
-          </p>
+        <div className={`p-4 sm:p-5 ${photo ? 'border-l border-line' : ''}`}>
+          <dt className="label">Model confidence</dt>
+          <dd className="tnum mt-1 text-[26px] leading-none sm:text-[30px]">{Math.round(analysis.confidence)}%</dd>
+          <dd className="label mt-2">Self-reported, not verified</dd>
         </div>
-
-        <dl className={`grid border-t border-line ${sick ? 'grid-cols-2' : 'grid-cols-1'}`}>
-          <div className="p-5">
-            <dt className="label">Model confidence</dt>
-            <dd className="tnum mt-1 text-[32px] leading-none"><CountUp value={Math.round(analysis.confidence)} suffix="%" /></dd>
-            <dd className="label mt-2">Self-reported, not verified</dd>
+        {sick && (
+          <div className="border-l border-line p-4 sm:p-5">
+            <dt className="label">Affected area</dt>
+            <dd className="tnum mt-1 text-[26px] leading-none text-madder sm:text-[30px]">{Math.round(analysis.affected_area_percent)}%</dd>
+            <dd className="label mt-2">Of the visible leaf</dd>
           </div>
-          {sick && (
-            <div className="border-l border-line p-5">
-              <dt className="label">Affected area</dt>
-              <dd className="tnum mt-1 text-[32px] leading-none text-madder"><CountUp value={Math.round(analysis.affected_area_percent)} suffix="%" /></dd>
-              <dd className="label mt-2">Of the visible leaf</dd>
-            </div>
-          )}
-        </dl>
-      </div>
+        )}
+      </dl>
 
       {(symptoms.length > 0 || analysis.reasoning) && (
-        <details className="group mt-4 rounded-2xl border border-line bg-card px-5 py-4">
+        <details className="group border-b border-line px-5 py-3 sm:px-8">
           <summary className="flex min-h-10 cursor-pointer list-none items-center justify-between text-[15px]">
             Why this result
             <span className="label transition-transform group-open:rotate-180" aria-hidden>v</span>
           </summary>
-          <div className="mt-3 space-y-4">
+          <div className="mt-3 space-y-4 pb-2">
             {symptoms.length > 0 && (
               <ul className="divide-y divide-line border-y border-line">
                 {symptoms.map((s, i) => (
@@ -87,6 +64,6 @@ export function AnalysisResults({ analysis, photo }: AnalysisResultsProps) {
           </div>
         </details>
       )}
-    </section>
+    </div>
   );
 }
