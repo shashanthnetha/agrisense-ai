@@ -6,7 +6,7 @@ import { LeafPlate } from "@/components/site/LeafPlate";
 const STEPS = [
   { n: "01", title: "Photograph", body: "One affected leaf, in daylight, filling most of the frame." },
   { n: "02", title: "Read", body: "The photo is read for crop, visible symptoms and how much of the leaf is affected." },
-  { n: "03", title: "Report", body: "A short report with the likely disease, what to do first, organic steps and prevention." },
+  { n: "03", title: "Report", body: "A short report with the likely disease, the symptoms seen and prevention. Treatment is referred to a local agriculture officer for confirmation." },
   { n: "04", title: "Listen", body: "When audio is enabled for this demo, a short spoken summary of the result is available in English, Hindi, Tamil or Telugu." },
 ];
 
@@ -39,7 +39,7 @@ export default function LandingPage() {
               A field report for a sick leaf, from one photo
             </h1>
             <p className="mt-6 max-w-[34rem] text-[18px] leading-[28px] text-ink-2">
-              Photograph the affected leaf. AgriSense names the likely disease, lists the symptoms it saw, and sets out the organic and prevention steps.
+              Photograph the affected leaf. AgriSense names the likely disease, lists the symptoms it saw, and sets out prevention steps. Treatment is referred to a local agriculture officer for confirmation.
             </p>
             <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-4">
               <Link href="/scan" className="inline-flex h-12 items-center gap-2 rounded-[10px] bg-ink px-6 text-[15px] font-medium text-paper transition-[transform,background-color] duration-150 hover:bg-ink/85 active:scale-[0.98]">
