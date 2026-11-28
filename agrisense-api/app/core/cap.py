@@ -28,6 +28,17 @@ def _until():
     return dt if dt.tzinfo else None
 
 
+def window_open() -> bool:
+    """True when the public window is fully configured and still open. Read-only counterpart of check_window."""
+    until = _until()
+    return bool(
+        until is not None
+        and settings.SCAN_TOTAL_CAP > 0
+        and settings.DATABASE_URL
+        and datetime.now(timezone.utc) < until
+    )
+
+
 def check_window() -> None:
     """Refuse unless the public window is fully and correctly configured and still open."""
     until = _until()
