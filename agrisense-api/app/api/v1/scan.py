@@ -3,7 +3,7 @@ from typing import Optional
 import base64
 import logging
 from app.services.detection import analyze_image, AnalysisError, InvalidImage, validate_image
-from app.services.rag import query_disease_knowledge, context_has_verified_source, NO_MATCH_CONTEXT
+from app.services.rag import query_disease_knowledge, verified_context_of, NO_MATCH_CONTEXT
 from app.services.treatment import generate_treatment, TreatmentError
 from app.core import cap, limits
 from app.core.config import settings
@@ -156,7 +156,8 @@ async def _analyze(request: Request, image: UploadFile, language: str):
             }
         knowledge_match = "found"
 
-        if not context_has_verified_source(rag_context):
+        verified = verified_context_of(rag_context)
+        if not verified:
             # The page cannot show unsourced advice, so do not pay for a model call that would be hidden.
             return {
                 "status": "disease_detected",
@@ -168,7 +169,7 @@ async def _analyze(request: Request, image: UploadFile, language: str):
             }
 
         try:
-            treatment = await generate_treatment(analysis, rag_context)
+            treatment = await generate_treatment(analysis, verified)
         except TreatmentError:
             # Keep the diagnosis; say plainly that the treatment plan is unavailable.
             return {

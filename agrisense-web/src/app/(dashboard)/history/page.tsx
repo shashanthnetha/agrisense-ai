@@ -84,7 +84,7 @@ export default function HistoryPage() {
                 {items.map((r) => (
                   <li key={r.id} className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between">
                     <div className="min-w-0">
-                      <p className="break-words font-serif text-[22px] leading-[28px]">{r.analysis.disease_detected ? r.analysis.disease_name : 'No disease seen'}</p>
+                      <p className="head break-words text-[20px] leading-[26px]">{r.analysis.disease_detected ? r.analysis.disease_name : 'No disease seen'}</p>
                       <p className="mt-1 text-[14px] text-ink-2">{r.analysis.crop_type} · {when(r.savedAt)} · {Math.round(r.analysis.confidence)}% model confidence</p>
                     </div>
                     <div className="flex shrink-0 gap-2">

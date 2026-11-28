@@ -58,8 +58,30 @@ test('only allow-listed text fields are saved: no image, audio or unknown keys',
   assert.deepEqual(Object.keys(r.analysis).sort(), ['affected_area_percent', 'confidence', 'crop_type', 'disease_detected', 'disease_name', 'is_plant', 'reasoning', 'urgency', 'visible_symptoms']);
 });
 test('chemical treatment is never stored', () => {
-  const t = { immediate_action: 'a', organic_treatment: { method: 'm', materials: [], dosage: 'd' }, chemical_treatment: { name: 'X', dose: '5ml' }, prevention_tips: [], recovery_timeline: '', warning_signs: '' };
+  const t = { immediate_action: 'a', organic_treatment: { method: 'm', materials: [], dosage: 'd' }, chemical_treatment: { name: 'X', dose: '5ml' }, prevention_tips: [], recovery_timeline: '', warning_signs: '', source_verified: true };
   const r = toSavedReport(input({ treatment: t }))!;
   assert.equal(r.treatment!.chemical_treatment, null);
   assert.ok(!JSON.stringify(r).includes('5ml'));
+});
+
+test('unverified treatment text is never stored, and tampered storage cannot bring it back', () => {
+  const t = { immediate_action: 'HIDDEN-ACTION', organic_treatment: { method: 'HIDDEN-METHOD', materials: ['m'], dosage: '1 tsp' }, chemical_treatment: null, prevention_tips: ['HIDDEN-TIP'], recovery_timeline: '7 days', warning_signs: 'HIDDEN-WARN' };
+  const r = toSavedReport(input({ treatment: t }))!;
+  assert.equal(r.treatment, null);
+  assert.ok(!JSON.stringify(r).includes('HIDDEN'));
+  const s = new MemStore();
+  s.setItem(HISTORY_KEY, JSON.stringify([{ ...mk(1), treatment: t }]));
+  const loaded = loadHistory(s);
+  assert.equal(loaded[0].treatment, null);
+  s.setItem(HISTORY_KEY, JSON.stringify([{ ...mk(1), treatment: { ...t, source_verified: 'yes' } }]));
+  assert.equal(loadHistory(s)[0].treatment, null);
+});
+test('a verified treatment is kept (text fields only)', () => {
+  const t = { immediate_action: 'a', organic_treatment: { method: 'VERIFIED-METHOD', materials: [], dosage: '' }, chemical_treatment: null, prevention_tips: [], recovery_timeline: '', warning_signs: '', source_verified: true };
+  assert.equal(toSavedReport(input({ treatment: t }))!.treatment!.organic_treatment.method, 'VERIFIED-METHOD');
+});
+test('saving the same id twice does not duplicate', () => {
+  const s = new MemStore();
+  addReport(mk(1), s); addReport(mk(1), s);
+  assert.equal(loadHistory(s).length, 1);
 });

@@ -32,13 +32,80 @@ NO_MATCH_CONTEXT = (
 )
 
 
-VERIFIED_MARKER = "[source-verified]"
+import re as _re
+from datetime import date as _date
+
+# A reference record counts as checked only when its own stored fields carry flat, schema-valid provenance
+# (Pinecone metadata cannot hold nested objects). Words inside retrieved text can never make a record verified.
+VERIFIABLE_FIELDS = ("organic_treatment", "prevention")
+_URL_RE = _re.compile(r"^https://[A-Za-z0-9.-]+\.[A-Za-z]{2,}(/\S*)?$")
 
 
-def context_has_verified_source(context: str) -> bool:
-    """True only when retrieved notes carry a checked source. build_context never writes the marker today
-    (the stored records have no provenance), so no treatment text is generated or shown until that exists."""
-    return isinstance(context, str) and VERIFIED_MARKER in context
+class RetrievedContext(str):
+    """The notes sent to the model (str) plus `verified_context`: text built ONLY from records that passed
+    validate_provenance, limited to the fields they verify. Plain strings carry none, so they fail closed."""
+
+    verified_context: str = ""
+
+    def __new__(cls, text: str, verified_context: str = ""):
+        obj = super().__new__(cls, text)
+        obj.verified_context = verified_context or ""
+        return obj
+
+
+def verified_context_of(context) -> str:
+    """The verified text of a retrieval result, or "" (also for plain strings, errors and no-match)."""
+    v = getattr(context, "verified_context", "")
+    return v if isinstance(v, str) else ""
+
+
+def validate_provenance(metadata, crop: Optional[str] = None) -> Optional[set]:
+    """Return the set of fields this record verifies, or None when the provenance is missing or malformed.
+    Needs: https source_url, source_title, verified_by, verified_on (YYYY-MM-DD, not in the future),
+    verified_fields (a list), a name, and a crop that matches the scanned crop when one is known.
+    Treatment text is usable only if 'organic_treatment' is among the verified fields."""
+    if not isinstance(metadata, dict):
+        return None
+    for key in ("name", "crop", "source_title", "verified_by"):
+        v = metadata.get(key)
+        if not isinstance(v, str) or not v.strip():
+            return None
+    url = metadata.get("source_url")
+    if not isinstance(url, str) or not _URL_RE.match(url):
+        return None
+    on = metadata.get("verified_on")
+    try:
+        if not isinstance(on, str) or not _re.fullmatch(r"\d{4}-\d{2}-\d{2}", on) or _date.fromisoformat(on) > _date.today():
+            return None
+    except ValueError:
+        return None
+    fields = metadata.get("verified_fields")
+    if not isinstance(fields, list) or not all(isinstance(f, str) for f in fields):
+        return None
+    ok = {f for f in fields if f in VERIFIABLE_FIELDS}
+    if "organic_treatment" not in ok:
+        return None
+    wanted = _clean_crop(crop)
+    if wanted and metadata["crop"].strip().lower() != wanted.lower():
+        return None
+    return ok
+
+
+def build_verified_context(matches: list, crop: Optional[str] = None) -> str:
+    """Notes from validated records only, each limited to the fields its provenance covers."""
+    out = ""
+    for match in matches:
+        metadata = getattr(match, "metadata", None)
+        ok = validate_provenance(metadata, crop)
+        if not ok:
+            continue
+        out += "\n--- Verified Reference ---\n"
+        out += f"Name: {metadata.get('name')}\nCrop: {metadata.get('crop')}\n"
+        out += f"Source: {metadata.get('source_title')} ({metadata.get('source_url')})\n"
+        out += f"Organic Treatment: {metadata.get('organic_treatment')}\n"
+        if "prevention" in ok:
+            out += f"Prevention: {metadata.get('prevention')}\n"
+    return out
 
 
 def _mode() -> str:
@@ -180,11 +247,11 @@ async def query_disease_knowledge(disease: str, crop: str, symptoms: Optional[Se
     try:
         if _mode() == "symptom" and symptoms:
             matches = await run_provider(_query_symptoms_sync, symptoms, crop, timeout=RAG_TIMEOUT_SECONDS)
-            return build_context(matches) if matches else NO_MATCH_CONTEXT
+            return RetrievedContext(build_context(matches), build_verified_context(matches, crop)) if matches else NO_MATCH_CONTEXT
         # The embedding model and the Pinecone call are blocking: keep them off the event loop.
         matches = await run_provider(_query_sync, disease, crop, timeout=RAG_TIMEOUT_SECONDS)
         context = build_context(matches)
-        return context if context else NO_MATCH_CONTEXT
+        return RetrievedContext(context, build_verified_context(matches, crop)) if context else NO_MATCH_CONTEXT
     except Exception as e:
         logger.error("Error querying Pinecone (%s): %s", type(e).__name__, e)
         return "Error retrieving knowledge."

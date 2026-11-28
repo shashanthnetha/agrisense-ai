@@ -77,7 +77,7 @@ export function toSavedReport(input: ReportInput, now: Date = new Date(), id?: s
     language: str(input.language, 30) || 'English',
     status: input.status,
     analysis,
-    treatment: cleanTreatment(input.treatment),
+    treatment: input.treatment?.source_verified === true ? cleanTreatment(input.treatment) : null,
     treatmentMessage: input.treatmentMessage ? str(input.treatmentMessage, 600) : undefined,
     knowledgeMatch: input.knowledgeMatch === 'found' || input.knowledgeMatch === 'none' ? input.knowledgeMatch : undefined,
   };
@@ -99,7 +99,11 @@ export function loadHistory(store?: Store | null): SavedReport[] {
     if (!raw) return [];
     const data = JSON.parse(raw);
     if (!Array.isArray(data)) return [];
-    return data.filter(valid).slice(0, MAX_ENTRIES);
+    // Never trust stored treatment text unless it is explicitly marked verified (storage can be edited by hand).
+    return data.filter(valid).slice(0, MAX_ENTRIES).map((r) => ({
+      ...r,
+      treatment: r.treatment && r.treatment.source_verified === true ? cleanTreatment(r.treatment) : null,
+    }));
   } catch {
     return [];
   }

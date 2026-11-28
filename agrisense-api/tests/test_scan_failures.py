@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from app.api.v1 import scan
+from app.services.rag import RetrievedContext
 from app.services import detection
 from app.services.detection import AnalysisError, parse_analysis
 
@@ -252,7 +253,7 @@ def test_unsourced_notes_skip_the_treatment_call(monkeypatch):
 def test_disease_path_still_works(monkeypatch):
     """Only when retrieved notes carry a checked source is a treatment generated (mocked here)."""
     async def ok(_): return GOOD
-    async def rag(disease=None, crop=None, **kw): return "Name: A\n[source-verified]"
+    async def rag(disease=None, crop=None, **kw): return RetrievedContext("Name: A", "verified A")
     async def plan(*a, **k): return {"immediate_action": "x"}
     monkeypatch.setattr(scan, "query_disease_knowledge", rag)
     monkeypatch.setattr(scan, "analyze_image", ok)

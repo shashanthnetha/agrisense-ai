@@ -57,17 +57,21 @@ export function ResultStory({ analysis, treatment, treatmentMessage, knowledgeMa
       <div className="wrap pb-12 pt-8 sm:pb-16 sm:pt-12">
       <p className="label !text-lime">Field report{reportDate ? ` · ${reportDate}` : ''} · from one photo</p>
 
-      <div className="mt-5 grid items-start gap-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:gap-14">
-        <figure>
-          <div className="aspect-[4/3] w-full overflow-hidden rounded-[4px] bg-night">
-            {photo ? <PhotoLens src={photo} className="h-full w-full" /> : (
-              <div className="flex h-full w-full items-center justify-center p-6 text-center text-[14px] leading-[21px] text-bone/70">
-                The photo is not kept. Only the text of this report is saved on this device.
-              </div>
-            )}
-          </div>
-          <figcaption className="label mt-3 !text-bone/60">{photo ? 'Your photo, as taken. Nothing is marked.' : 'Saved report, text only.'}</figcaption>
-        </figure>
+      {!photo && (
+        <p role="note" className="mt-4 max-w-[40rem] rounded-[4px] border border-bone/25 px-4 py-3 text-[14px] leading-[21px] text-bone/80">
+          Saved report, text only. The photo was not stored.
+        </p>
+      )}
+
+      <div className={`mt-5 grid items-start gap-8 ${photo ? 'lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:gap-14' : 'max-w-[52rem]'}`}>
+        {photo ? (
+          <figure>
+            <div className="aspect-[4/3] w-full overflow-hidden rounded-[4px] bg-night">
+              <PhotoLens src={photo} className="h-full w-full" />
+            </div>
+            <figcaption className="label mt-3 !text-bone/60">Your photo, as taken. Nothing is marked.</figcaption>
+          </figure>
+        ) : null}
 
         <div className="min-w-0">
           <p className="text-[17px] italic text-bone/75">{sick ? 'Looks like' : 'What we see'}</p>
@@ -139,7 +143,7 @@ export function ResultStory({ analysis, treatment, treatmentMessage, knowledgeMa
           ) : (
             <p className="mt-4 text-[15px] leading-[23px] text-ink-2">No distinct symptoms were reported for this photo.</p>
           )}
-          <p className="mt-3 text-[13px] leading-[19px] text-ink-3">These are the model&apos;s words about the photo. Use &ldquo;Inspect full size&rdquo; on the photo to compare them with your leaf.</p>
+          <p className="mt-3 text-[13px] leading-[19px] text-ink-3">These are the model&apos;s words about the photo. {photo ? 'Use "Inspect full size" on the photo to compare them with your leaf.' : 'Compare them with your leaf before you decide anything.'}</p>
         </div>
         <div>
           <dl className="grid gap-6 text-[13.5px] leading-[20px] sm:grid-cols-2">

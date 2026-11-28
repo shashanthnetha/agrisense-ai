@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from app.api.v1 import scan
+from app.services.rag import RetrievedContext
 from app.services import treatment
 from app.services.treatment import TreatmentError, parse_treatment, generate_treatment
 
@@ -42,7 +43,7 @@ def post(c):
 @pytest.fixture(autouse=True)
 def _stubs(monkeypatch):
     async def rag(disease=None, crop=None, **kw):
-        return "ctx [source-verified]"  # these tests exercise the treatment path, which needs a checked source
+        return RetrievedContext("ctx", "verified ctx")  # these tests exercise the treatment path, which needs checked records
 
     async def ok(_):
         return GOOD
