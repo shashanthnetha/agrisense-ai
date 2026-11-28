@@ -238,7 +238,7 @@ export default function ScanPage() {
             {hasPlan && result.treatment && status && !status.voice_available && (
               <p className="flex items-center gap-3 border-b border-line px-5 py-4 text-[14px] text-ink-2 sm:px-8">
                 <VolumeX className="h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden />
-                Audio is off for this demo. The written plan below has the same steps.
+                Audio is off for this demo. When it is on, it plays a short spoken summary of the result, not this full plan.
               </p>
             )}
 
