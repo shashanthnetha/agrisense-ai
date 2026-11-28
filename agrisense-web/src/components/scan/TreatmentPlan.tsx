@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Treatment } from '@/lib/types';
-import { safeText, safeList } from '@/lib/advice';
+import { safeText, safeList, treatmentVerified } from '@/lib/advice';
 
 interface TreatmentPlanProps {
   treatment: Treatment;
@@ -24,12 +24,16 @@ function Entry({ n, title, children }: { n: string; title: string; children: Rea
 /* Entry 01 ("Do this first") is rendered by the report page itself as the lead. */
 export function TreatmentPlan({ treatment }: TreatmentPlanProps) {
   const org = treatment.organic_treatment;
-  const method = safeText(org.method) || 'Ask a local agriculture officer about organic options for this crop.';
-  const dosage = safeText(org.dosage);
+  const fallback = 'Ask a local agriculture officer about organic options for this crop.';
+  // Unverified records carry no provenance: the whole treatment (method, dose,
+  // materials) falls back to the officer line, never an actionable spray recipe.
+  const verified = treatmentVerified(treatment);
+  const method = verified ? safeText(org.method) || fallback : fallback;
+  const dosage = verified ? safeText(org.dosage) : '';
   const tips = safeList(treatment.prevention_tips);
   const warning = safeText(treatment.warning_signs);
   // Materials without a verified dose are not a recipe: never list them on their own.
-  const showMaterials = safeList(org.materials).length > 0 && !!dosage && !/not shown/i.test(dosage);
+  const showMaterials = verified && safeList(org.materials).length > 0 && !!dosage && !/not shown/i.test(dosage);
   const materials = showMaterials ? safeList(org.materials) : [];
   return (
     <div aria-label="Treatment plan" className="rise rise-2">
