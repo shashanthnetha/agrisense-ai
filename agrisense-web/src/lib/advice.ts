@@ -19,3 +19,12 @@ export function safeText(text: string | undefined | null): string {
 
 export const safeList = (items: string[] | undefined | null): string[] =>
   (items ?? []).filter((i) => typeof i === 'string' && !unsupported(i));
+
+/*
+ * Treatment advice (method, dose, materials, immediate action) renders only when the
+ * server marks the record source-verified. No current payload carries that mark - the
+ * reference notes have no provenance - so unverified treatment always falls back to
+ * the agriculture-officer line instead of an actionable spray recommendation.
+ */
+export const treatmentVerified = (t: unknown): boolean =>
+  !!t && typeof t === 'object' && (t as { source_verified?: unknown }).source_verified === true;
