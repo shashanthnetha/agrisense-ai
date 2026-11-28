@@ -35,6 +35,23 @@ export const analyzeCrop = async (imageFile: File, language: string = "English")
   return response.data;
 };
 
+export interface ScanStatus {
+  open: boolean;
+  voice_available: boolean;
+  access_key_accepted: boolean;
+  state: 'open' | 'closed' | 'key_required' | 'paused';
+}
+
+// Lets the page show an honest open/paused state before anyone uploads. null = status unknown.
+export const getScanStatus = async (): Promise<ScanStatus | null> => {
+  try {
+    const response = await api.get<ScanStatus>('/scan/status');
+    return response.data;
+  } catch {
+    return null;
+  }
+};
+
 // Placeholder for history - we'll need to implement the backend endpoint for this
 export const getScanHistory = async (): Promise<unknown[]> => {
   // const response = await api.get('/scan/history');

@@ -2,14 +2,14 @@
 
 import React, { useState, useEffect } from 'react';
 import { ImageUploader } from '@/components/scan/ImageUploader';
-import { AnalysisResults } from '@/components/scan/AnalysisResults';
-import { TreatmentPlan } from '@/components/scan/TreatmentPlan';
+import { ResultStory } from '@/components/scan/ResultStory';
 import { VoicePlayer } from '@/components/scan/VoicePlayer';
 import { Wordmark } from '@/components/site/Wordmark';
-import { analyzeCrop, ACCESS_KEY_STORAGE } from '@/lib/api';
+import { analyzeCrop, getScanStatus, ACCESS_KEY_STORAGE, ScanStatus } from '@/lib/api';
 import { ScanResponse } from '@/lib/types';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import { VolumeX } from 'lucide-react';
 
 const TIPS = [
   'Use daylight and avoid shadows',
@@ -18,7 +18,21 @@ const TIPS = [
   'Skip blurry or very dark photos',
 ];
 
-const primary = 'inline-flex h-12 items-center justify-center gap-2 rounded-[10px] bg-ink px-6 text-[15px] font-medium text-paper transition-[transform,background-color] duration-150 hover:bg-ink/85 active:scale-[0.98] disabled:opacity-50';
+function PausedPlate({ state }: { state: ScanStatus['state'] }) {
+  return (
+    <div role="status" className="rounded-[6px] border border-bone/25 bg-bone/[0.04] px-6 py-16 sm:py-20">
+      <p className="label">Scanning availability</p>
+      <h2 className="display mt-4 max-w-[16ch] text-[36px] sm:text-[44px]">
+        {state === 'closed' ? <>This demo has <em>closed.</em></> : <>Scanning is <em>paused</em> right now.</>}
+      </h2>
+      <p className="mt-4 max-w-[24rem] text-[15px] leading-[23px] text-bone/75">
+        {state === 'closed'
+          ? 'The public demo window has ended, so new photos are not being read. This page will open again if a new window is announced.'
+          : 'New photos are not being read at the moment. Please check back later.'}
+      </p>
+    </div>
+  );
+}
 
 export default function ScanPage() {
   const [result, setResult] = useState<ScanResponse | null>(null);
@@ -31,9 +45,11 @@ export default function ScanPage() {
   const [lastFile, setLastFile] = useState<File | null>(null);
   const [photo, setPhoto] = useState<string | null>(null);
   const [accessKey, setAccessKey] = useState<string>('');
+  const [status, setStatus] = useState<ScanStatus | null>(null);
 
   useEffect(() => {
     setAccessKey(window.localStorage.getItem(ACCESS_KEY_STORAGE) || '');
+    getScanStatus().then(setStatus);
   }, []);
 
   useEffect(() => {
@@ -42,10 +58,19 @@ export default function ScanPage() {
     };
   }, [photo]);
 
+  // A failure or "no reliable result" must be seen: bring it into view (and keep it out of the hidden area behind the photo).
+  useEffect(() => {
+    if (!notice && !error) return;
+    document.getElementById('scan-feedback')?.scrollIntoView({ block: 'center' });
+  }, [notice, error]);
+
   const saveAccessKey = (value: string) => {
     setAccessKey(value);
     window.localStorage.setItem(ACCESS_KEY_STORAGE, value.trim());
   };
+
+  // Unknown status (endpoint unreachable) still lets a visitor try; the API's own gate answers honestly.
+  const canScan = !status || status.open;
 
   const handleUpload = async (file: File) => {
     setIsLoading(true);
@@ -63,11 +88,28 @@ export default function ScanPage() {
       }
       setPhoto(URL.createObjectURL(file));
       setResult(data);
+      window.scrollTo({ top: 0 });
       toast.success('Report ready');
     } catch (err: unknown) {
       console.error(err);
+      const status = (err as { response?: { status?: number } })?.response?.status;
       const detail = (err as { response?: { data?: { detail?: unknown } } })?.response?.data?.detail;
-      setError((typeof detail === 'string' && detail) || 'We could not analyze this image. Please try again.');
+      const detailText = (typeof detail === 'string' && detail) || '';
+      // The gate refused mid-session: re-read the status and move to the closed screen instead of a dead retry.
+      if (/not open right now|demo has closed/i.test(detailText)) {
+        const fresh = await getScanStatus();
+        if (fresh && !fresh.open) {
+          setStatus(fresh);
+          return;
+        }
+      }
+      if (status === 400 || status === 413 || status === 429) {
+        // The photo or the allowance is the problem: pass the server's own guidance.
+        setError(detailText || 'We could not analyze this image. Please try again.');
+      } else {
+        // Service or network failure: do not blame the photo; it stays selected for the retry.
+        setError('The service could not finish reading that photo just now. That is a service problem, not the photo. Please try again in a moment.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -80,111 +122,112 @@ export default function ScanPage() {
     setNotice(null);
   };
 
+  const reportDate = result ? new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) : null;
+
+  const audio = result && hasPlan && result.treatment ? (
+    status?.voice_available ? (
+      <VoicePlayer analysis={result.analysis} treatment={result.treatment} language={language} />
+    ) : status ? (
+      <p className="flex max-w-[30rem] items-center gap-3 text-[14px] leading-[20px] text-ink-2">
+        <VolumeX className="h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden />
+        Audio is off for this demo. When it is on, it plays a short spoken summary of the result, not this full plan.
+      </p>
+    ) : null
+  ) : null;
+
   return (
-    <div className="min-h-screen">
-      <header className="mx-auto flex h-16 max-w-[1200px] items-center justify-between px-6">
-        <Wordmark />
+    <div data-scan-page className={`min-h-screen ${result ? '' : 'dark-surface bg-night text-bone'}`}>
+      <header className={`mx-auto flex h-16 max-w-[1320px] items-center justify-between px-5 sm:px-10 ${result ? 'hidden' : ''}`}>
+        <Wordmark tone={result ? 'ink' : 'bone'} />
         <nav aria-label="Main" className="flex items-center gap-6 text-[14px]">
-          <Link href="/history" className="text-ink-2 transition-colors hover:text-ink">History</Link>
+          <Link href="/history" className="text-bone/70 transition-colors hover:text-bone">History</Link>
         </nav>
       </header>
 
-      <main className="mx-auto max-w-[1200px] px-6 pb-24 pt-8">
+      <main className={result ? 'pb-20 sm:pb-24' : 'mx-auto max-w-[1320px] px-6 pb-28 pt-6 sm:px-10'}>
         {!result ? (
-          <div className="rise grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
+          <div className="grid gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16">
             <div>
-              <ImageUploader onUpload={handleUpload} isLoading={isLoading} />
+              <p className="label rise">New scan</p>
+              <h1 className="display mt-4 text-[56px] sm:text-[88px]">
+                <span className="rv"><span>Scan a</span></span>
+                <span className="rv"><span style={{ '--d': '110ms' } as React.CSSProperties}><em>leaf.</em></span></span>
+              </h1>
+              <p className="rise mt-5 max-w-[26rem] text-[16px] leading-[25px] text-bone/75" style={{ '--d': '220ms' } as React.CSSProperties}>
+                One photo in, a tentative identification and next steps out. Confirm with a local agriculture officer.
+              </p>
+              <ul aria-label="For a clearer result" className="rise mt-8 max-w-[28rem]" style={{ '--d': '380ms' } as React.CSSProperties}>
+                {TIPS.map((t, i) => (
+                  <li key={t} className="flex gap-4 border-t border-bone/20 py-3 text-[14px] leading-[20px] text-bone/75">
+                    <span className="font-mono text-[11px] leading-[20px] text-bone/50">{String(i + 1).padStart(2, '0')}</span>{t}
+                  </li>
+                ))}
+              </ul>
+              {status?.access_key_accepted && (
+                <div className="rise mt-8 max-w-[20rem]" style={{ '--d': '440ms' } as React.CSSProperties}>
+                  <label htmlFor="access-key" className="label block">Access key (needed to scan)</label>
+                  <input id="access-key" type="password" autoComplete="off" value={accessKey} onChange={(e) => saveAccessKey(e.target.value)} className="mt-2 h-10 w-full rounded-lg border border-bone/30 bg-night px-3 text-[14px] text-bone" />
+                </div>
+              )}
+            </div>
+
+            <div className="rise" style={{ '--d': '300ms' } as React.CSSProperties}>
+              {canScan ? (
+                <ImageUploader onUpload={handleUpload} isLoading={isLoading} language={language} onLanguageChange={setLanguage} showLanguage={!!status?.voice_available} />
+              ) : (
+                status && <PausedPlate state={status.state} />
+              )}
 
               {notice && (
-                <div role="status" className="mt-4 border-l-2 border-[#7a5200] bg-card p-4">
+                <div id="scan-feedback" role="status" className="mt-4 border-l-2 border-[#ff9a62] bg-bone/[0.06] p-4">
                   <p className="text-[15px]">No reliable result</p>
-                  <p className="mt-1 text-[14px] leading-[20px] text-ink-2">{notice}</p>
+                  <p className="mt-1 text-[14px] leading-[20px] text-bone/75">{notice}</p>
                 </div>
               )}
 
               {error && (
-                <div role="alert" className="mt-4 border-l-2 border-madder bg-card p-4">
+                <div id="scan-feedback" role="alert" className="mt-4 border-l-2 border-[#ff9a62] bg-bone/[0.06] p-4">
                   <p className="text-[15px]">Analysis failed</p>
-                  <p className="mt-1 text-[14px] leading-[20px] text-ink-2">{error}</p>
-                  {lastFile && (
-                    <button
-                      type="button"
-                      disabled={isLoading}
-                      onClick={() => handleUpload(lastFile)}
-                      className="mt-3 inline-flex h-10 items-center rounded-lg border border-line bg-paper px-4 text-[14px] transition-colors hover:bg-raised disabled:opacity-50"
-                    >
+                  <p className="mt-1 text-[14px] leading-[20px] text-bone/75">{error}</p>
+                  {lastFile && canScan && (
+                    <button type="button" disabled={isLoading} onClick={() => handleUpload(lastFile)} className="mt-3 inline-flex h-10 items-center rounded-full border border-bone/40 px-4 text-[14px] transition-colors hover:bg-bone/10 disabled:opacity-50">
                       Try again
                     </button>
                   )}
                 </div>
               )}
             </div>
-
-            <aside className="lg:pt-6">
-              <p className="label">New scan</p>
-              <h1 className="mt-3 max-w-[14ch] text-[40px] leading-[1.06] tracking-[-0.02em] sm:text-[48px]">Scan your crop</h1>
-              <p className="mt-4 max-w-[28rem] text-[16px] leading-[24px] text-ink-2">
-                Get an AI-assisted check of a leaf from one photo.
-              </p>
-
-              <h2 className="mt-10 text-[20px] leading-[28px]">For a clearer result</h2>
-              <ol className="mt-3 divide-y divide-line border-y border-line">
-                {TIPS.map((t, i) => (
-                  <li key={t} className="grid grid-cols-[32px_1fr] py-3 text-[15px] leading-[22px] text-ink-2">
-                    <span className="label tnum pt-0.5">{String(i + 1).padStart(2, '0')}</span>
-                    {t}
-                  </li>
-                ))}
-              </ol>
-
-              <div className="mt-10">
-                <label htmlFor="access-key" className="label block">Access key (needed to scan during the demo)</label>
-                <input
-                  id="access-key"
-                  type="password"
-                  autoComplete="off"
-                  value={accessKey}
-                  onChange={(e) => saveAccessKey(e.target.value)}
-                  className="mt-2 h-10 w-full rounded-lg border border-line bg-card px-3 text-[14px] text-ink"
-                />
-              </div>
-            </aside>
           </div>
         ) : (
-          <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
-            <div className="lg:sticky lg:top-8 lg:self-start">
-              <AnalysisResults analysis={result.analysis} photo={photo} />
-              <button type="button" onClick={reset} className={`${primary} mt-6 w-full`}>Scan another leaf</button>
-            </div>
-
-            <div className="space-y-8">
-              {result.status === 'disease_detected' && hasPlan && result.treatment && (
-                <VoicePlayer
-                  analysis={result.analysis}
-                  treatment={result.treatment}
-                  onLanguageChange={setLanguage}
-                  currentLanguage={language}
-                />
-              )}
-
-              {hasPlan && result.treatment && <TreatmentPlan treatment={result.treatment} />}
-
-              {result.status === 'disease_detected' && !hasPlan && (
-                <div role="alert" className="border-l-2 border-[#7a5200] bg-card p-4">
-                  <p className="text-[15px]">
-                    {result.knowledge_match === 'none' ? 'No treatment advice for this reading' : 'Treatment plan unavailable'}
-                  </p>
-                  <p className="mt-1 text-[14px] leading-[20px] text-ink-2">
-                    {result.knowledge_match === 'none'
-                      ? "This problem is not in AgriSense's reference notes, so no treatment advice is given. Please show the leaf to a local agriculture officer."
-                      : result.treatment_message ?? 'Treatment advice is unavailable right now. Please scan again.'}
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
+          <ResultStory
+            analysis={result.analysis}
+            treatment={hasPlan ? result.treatment : null}
+            treatmentMessage={result.treatment_message}
+            knowledgeMatch={result.knowledge_match}
+            photo={photo}
+            reportDate={reportDate}
+            audio={audio}
+          />
         )}
       </main>
+
+      {result && (
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-paper/95 backdrop-blur pb-[env(safe-area-inset-bottom)]">
+          <div className="mx-auto flex max-w-[1320px] items-center justify-between gap-3 px-5 py-2.5 sm:px-10 sm:py-4">
+            <p className="label hidden sm:block">AI-assisted guidance, not a replacement for a local agriculture officer</p>
+            <div className="flex w-full items-center gap-2 sm:w-auto">
+              <Link href="/history" className="inline-flex h-11 shrink-0 items-center justify-center rounded-full border border-line px-5 text-[14px] text-ink transition-colors hover:bg-raised">History</Link>
+              <button
+                type="button"
+                onClick={reset}
+                className="inline-flex h-11 flex-1 items-center justify-center rounded-full bg-ink px-6 text-[14px] font-medium text-bone transition-[transform,background-color] duration-150 hover:bg-ink/85 active:scale-[0.98] sm:flex-none"
+              >
+                Scan another leaf
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
