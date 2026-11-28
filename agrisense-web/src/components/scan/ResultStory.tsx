@@ -60,9 +60,13 @@ export function ResultStory({ analysis, treatment, treatmentMessage, knowledgeMa
       <div className="mt-5 grid items-start gap-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:gap-14">
         <figure>
           <div className="aspect-[4/3] w-full overflow-hidden rounded-[4px] bg-night">
-            {photo ? <PhotoLens src={photo} className="h-full w-full" /> : null}
+            {photo ? <PhotoLens src={photo} className="h-full w-full" /> : (
+              <div className="flex h-full w-full items-center justify-center p-6 text-center text-[14px] leading-[21px] text-bone/70">
+                The photo is not kept. Only the text of this report is saved on this device.
+              </div>
+            )}
           </div>
-          <figcaption className="label mt-3 !text-bone/60">Your photo, as taken. Nothing is marked.</figcaption>
+          <figcaption className="label mt-3 !text-bone/60">{photo ? 'Your photo, as taken. Nothing is marked.' : 'Saved report, text only.'}</figcaption>
         </figure>
 
         <div className="min-w-0">

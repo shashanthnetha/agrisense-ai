@@ -32,6 +32,15 @@ NO_MATCH_CONTEXT = (
 )
 
 
+VERIFIED_MARKER = "[source-verified]"
+
+
+def context_has_verified_source(context: str) -> bool:
+    """True only when retrieved notes carry a checked source. build_context never writes the marker today
+    (the stored records have no provenance), so no treatment text is generated or shown until that exists."""
+    return isinstance(context, str) and VERIFIED_MARKER in context
+
+
 def _mode() -> str:
     """RAG_MODE=symptom turns on symptom-aware retrieval. Default stays the original name lookup."""
     return "symptom" if os.getenv("RAG_MODE", "").strip().lower() == "symptom" else "legacy"

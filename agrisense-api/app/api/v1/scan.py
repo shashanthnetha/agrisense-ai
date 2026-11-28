@@ -3,7 +3,7 @@ from typing import Optional
 import base64
 import logging
 from app.services.detection import analyze_image, AnalysisError, InvalidImage, validate_image
-from app.services.rag import query_disease_knowledge, NO_MATCH_CONTEXT
+from app.services.rag import query_disease_knowledge, context_has_verified_source, NO_MATCH_CONTEXT
 from app.services.treatment import generate_treatment, TreatmentError
 from app.core import cap, limits
 from app.core.config import settings
@@ -155,7 +155,18 @@ async def _analyze(request: Request, image: UploadFile, language: str):
                 "voice_data": None,
             }
         knowledge_match = "found"
-        
+
+        if not context_has_verified_source(rag_context):
+            # The page cannot show unsourced advice, so do not pay for a model call that would be hidden.
+            return {
+                "status": "disease_detected",
+                "analysis": analysis,
+                "treatment": None,
+                "knowledge_match": knowledge_match,
+                "treatment_message": "Treatment advice for this problem is not shown yet, because AgriSense has no checked source for it. Please show the leaf to a local agriculture officer.",
+                "voice_data": None,
+            }
+
         try:
             treatment = await generate_treatment(analysis, rag_context)
         except TreatmentError:

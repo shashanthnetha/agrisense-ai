@@ -8,6 +8,7 @@ import { SiteHeader } from '@/components/site/SiteHeader';
 import { SiteFooter } from '@/components/site/SiteFooter';
 import { analyzeCrop, getScanStatus, ACCESS_KEY_STORAGE, ScanStatus } from '@/lib/api';
 import { ScanResponse } from '@/lib/types';
+import { addReport, browserStore, toSavedReport } from '@/lib/history';
 import { toast } from 'sonner';
 import Link from 'next/link';
 import { VolumeX } from 'lucide-react';
@@ -89,8 +90,15 @@ export default function ScanPage() {
       }
       setPhoto(URL.createObjectURL(file));
       setResult(data);
+      // Save the text of the report on this device only (never the photo), as it is shown to the user.
+      const shownPlan = !!data.treatment && data.knowledge_match !== 'none';
+      const saved = toSavedReport({
+        status: data.status, analysis: data.analysis, treatment: shownPlan ? data.treatment : null,
+        treatmentMessage: data.treatment_message, knowledgeMatch: data.knowledge_match, language,
+      });
+      const savedOk = saved ? addReport(saved, browserStore()) : false;
       window.scrollTo({ top: 0 });
-      toast.success('Report ready');
+      toast.success(savedOk ? 'Report ready. Text saved on this device.' : 'Report ready');
     } catch (err: unknown) {
       console.error(err);
       const status = (err as { response?: { status?: number } })?.response?.status;

@@ -42,7 +42,7 @@ def post(c):
 @pytest.fixture(autouse=True)
 def _stubs(monkeypatch):
     async def rag(disease=None, crop=None, **kw):
-        return "ctx"
+        return "ctx [source-verified]"  # these tests exercise the treatment path, which needs a checked source
 
     async def ok(_):
         return GOOD

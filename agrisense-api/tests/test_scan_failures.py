@@ -233,9 +233,28 @@ def test_no_knowledge_match_abstains_without_treatment(monkeypatch):
     assert body["treatment"] is None and body["knowledge_match"] == "none" and body["treatment_message"]
 
 
-def test_disease_path_still_works(monkeypatch):
+def test_unsourced_notes_skip_the_treatment_call(monkeypatch):
+    """No checked source in the notes: the model is not called, the officer message is returned."""
+    calls = []
     async def ok(_): return GOOD
+    async def plan(*a, **k):
+        calls.append(1)
+        return {"immediate_action": "x"}
+    monkeypatch.setattr(scan, "analyze_image", ok)
+    monkeypatch.setattr(scan, "generate_treatment", plan)
+    body = post(make_client()).json()
+    assert calls == []
+    assert body["status"] == "disease_detected" and body["treatment"] is None
+    assert body["knowledge_match"] == "found" and "agriculture officer" in body["treatment_message"]
+    assert body["voice_data"] is None
+
+
+def test_disease_path_still_works(monkeypatch):
+    """Only when retrieved notes carry a checked source is a treatment generated (mocked here)."""
+    async def ok(_): return GOOD
+    async def rag(disease=None, crop=None, **kw): return "Name: A\n[source-verified]"
     async def plan(*a, **k): return {"immediate_action": "x"}
+    monkeypatch.setattr(scan, "query_disease_knowledge", rag)
     monkeypatch.setattr(scan, "analyze_image", ok)
     monkeypatch.setattr(scan, "generate_treatment", plan)
     r = post(make_client())
