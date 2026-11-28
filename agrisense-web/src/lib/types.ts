@@ -22,6 +22,7 @@ export interface Treatment {
   prevention_tips: string[];
   recovery_timeline: string;
   warning_signs: string;
+  source_verified?: boolean;
 }
 
 export interface ScanResponse {
