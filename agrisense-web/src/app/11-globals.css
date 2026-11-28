@@ -1,0 +1,97 @@
+@import "tailwindcss";
+
+/*
+ * Direction: the leaf photograph is the material. Dark leaf-shade surfaces
+ * hold the photo; warm paper holds the reading. One warm alert tone.
+ */
+@theme {
+  --color-paper: #ece6d3;
+  --color-card: #f5f1e3;
+  --color-raised: #e1dac2;
+  --color-ink: #15201a;
+  --color-ink-2: #46523f;
+  --color-ink-3: #6b7762;
+  --color-line: rgb(21 32 26 / 0.2);
+  --color-acid: #2c5a31;
+  --color-madder: #b4451a;
+  --color-moss: #3e7a3a;
+  --color-night: #0e170f;
+  --color-leaf: #16291a;
+  --color-lime: #d3e873;
+  --color-bone: #f1ecd9;
+
+  --font-sans: var(--font-ui), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-display), ui-serif, Georgia, serif;
+  --font-mono: var(--font-meta), ui-monospace, monospace;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html { background: var(--color-paper); }
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3 { font-family: var(--font-serif); font-weight: 400; }
+.tnum { font-variant-numeric: tabular-nums; }
+
+.label {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  line-height: 16px;
+  color: var(--color-ink-3);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.dark-surface .label { color: rgb(241 236 217 / 0.62); }
+
+.display {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 0.96;
+}
+.display em { font-style: italic; }
+
+:focus-visible { outline: 2px solid var(--color-madder); outline-offset: 3px; border-radius: 4px; }
+.dark-surface :focus-visible { outline-color: var(--color-lime); }
+::selection { background: var(--color-lime); color: var(--color-night); }
+
+/* ---- Motion (all decorative motion is transform/opacity only) ---- */
+.rv { display: block; overflow: hidden; padding-bottom: 0.08em; margin-bottom: -0.08em; }
+.rv > span { display: block; transform: translateY(112%); animation: rv-up 1s var(--ease-out) forwards; animation-delay: var(--d, 0ms); }
+@keyframes rv-up { to { transform: translateY(0); } }
+
+.stage-in { animation: stage-in 0.5s var(--ease-out) both; }
+@keyframes stage-in { from { opacity: 0; transform: scale(1.03); } to { opacity: 1; transform: none; } }
+
+.rise { animation: rise 0.8s var(--ease-out) both; animation-delay: var(--d, 0ms); }
+@keyframes rise { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+
+/* Hero photo settles in, then drifts very slowly. */
+.hero-photo { animation: settle 2.6s var(--ease-out) both; transform-origin: 62% 55%; }
+@keyframes settle { from { transform: scale(1.14); opacity: 0.6; } to { transform: scale(1.02); opacity: 1; } }
+
+
+@supports (animation-timeline: view()) {
+  .scroll-rise { animation: rise linear both; animation-timeline: view(); animation-range: entry 0% entry 40%; }
+  .hero-shift { animation: shift linear both; animation-timeline: scroll(root); animation-range: 0 90vh; }
+  .hero-fade { animation: fade-up linear both; animation-timeline: scroll(root); animation-range: 0 55svh; }
+  @keyframes fade-up { to { opacity: 0.1; transform: translateY(-5vh); } }
+  @keyframes shift { to { transform: translateY(14vh) scale(1.06); } }
+}
+
+/* Reading sweep across the photo: uniform, marks nothing. */
+.sweep { animation: sweep 2.2s cubic-bezier(0.6, 0, 0.4, 1) infinite; }
+@keyframes sweep { from { transform: translateX(-120%); } to { transform: translateX(420%); } }
+
+.row-link { transition: background-color .3s var(--ease-out), padding-left .3s var(--ease-out); }
+.row-link:hover { background: rgb(241 236 217 / 0.06); padding-left: 1rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  .rv > span, .rise, .hero-photo, .sweep, .stage-in, .scroll-rise, .hero-shift, .hero-fade { animation: none !important; transform: none; clip-path: none; opacity: 1; }
+  .rv > span { transform: none; }
+}
